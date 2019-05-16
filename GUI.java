@@ -83,11 +83,13 @@ public class GUI {
 				        	txtrInputFromFile.setText(txtrInputFromFile.getText() + line + "\n");
 				        	line = in.readLine();	
 				        }
+				        GridEmbedding.defineLayout(drawingArea.getWidth(), drawingArea.getHeight(), G);
+				        GraphDrawer.linearEdges(drawingArea.getGraphics(), G);
 				        
 				    } catch (Exception ex) {
 				    	ex.printStackTrace();
 				    }
-				    G.draw(drawingArea.getGraphics());
+				   
 				}
 			}
 			});
