@@ -3,36 +3,36 @@ import java.awt.Graphics;
 public class Node {
 
 	private String name;
-	private int[] position;
+	private double[] position;
 
-	Node(String name_, int[] position_) {
+	Node(String name_, double[] position_) {
 		name = name_;
 		position = position_;
 	}
 
 	Node(String name_) {
 		name = name_;
-		position = new int[] {0, 0};
+		position = new double[] {0, 0};
 	}
 
 	public String name() {
 		return name;
 	}
 
-	public int[] position() {
+	public double[] position() {
 		return position;
 	}
 
-	public void setPosition(int x, int y) {
+	public void setPosition(double x, double y) {
 		position[0] = x;
 		position[1] = y;
 	}
 
-	public int x() {
+	public double x() {
 		return position[0];
 	}
 
-	public int y() {
+	public double y() {
 		return position[1];
 	}
 

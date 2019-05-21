@@ -50,5 +50,19 @@ public class Graph {
 	public ArrayList<int[]> edges(){
 		return edges;
 	};
+	
+	public Node nearestNode(double x, double y) {
+		Node n = nodes.get(0);
+		double minDistance = Math.sqrt(Math.pow(x-n.x(), 2)+Math.pow(y-n.y(), 2));
+		double testDistance;
+		for(Node node: nodes) {
+			testDistance = Math.sqrt(Math.pow(x-node.x(), 2)+Math.pow(y-node.y(), 2));
+			if(testDistance < minDistance) {
+				minDistance = testDistance;
+				n = node;
+			}
+		}
+		return n;
+	}
 
 }

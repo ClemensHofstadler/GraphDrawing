@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.awt.Point;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -14,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 public class GUI {
-	
+
 	Graph G;
 
 	private JFrame frame;
@@ -84,7 +85,7 @@ public class GUI {
 				        	line = in.readLine();	
 				        }
 				        GridEmbedding.defineLayout(drawingArea.getWidth(), drawingArea.getHeight(), G);
-				        GraphDrawer.linearEdges(drawingArea.getGraphics(), G);
+				        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 				        
 				    } catch (Exception ex) {
 				    	ex.printStackTrace();
@@ -95,25 +96,36 @@ public class GUI {
 			});
 		menuBar.add(mnLoad);
 		frame.getContentPane().setLayout(null);
-		
+
 		drawingArea.setBounds(6, 6, 343, 310);
 		frame.getContentPane().add(drawingArea);
 		drawingArea.setLayout(null);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setBounds(353, 6, 179, 310);
 		frame.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
-		
+
 		JLabel lblSettings = new JLabel("Settings");
 		lblSettings.setBounds(56, 25, 61, 16);
 		panel_1.add(lblSettings);
-		
+
 		txtrInputFromFile.setLineWrap(true);
 		txtrInputFromFile.setWrapStyleWord(true);
 		txtrInputFromFile.setText("Input from file will be shown here");
 		txtrInputFromFile.setBounds(17, 59, 156, 217);
 		panel_1.add(txtrInputFromFile);
+
+		drawingArea.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(G != null && !G.nodes().isEmpty()) {
+					Point pt = e.getPoint();
+					Node n = G.nearestNode(pt.x, pt.y);
+					System.out.println("Mouse clicked at position:" + pt);
+					System.out.println("Nearest node:" + n.name());
+				}
+			}
+		});
 	}
 }
-
