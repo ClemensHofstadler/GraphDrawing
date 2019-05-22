@@ -1,19 +1,32 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.util.ArrayList;
 
 public abstract class GraphDrawer {
-	private static final int ARR_SIZE = 10;
-	
+	private static final int ARR_SIZE = 8;
+//======================================================================================
+//Draw graph
+//======================================================================================
+	public static void drawGraph(Graphics g, Graph G, int size, boolean linearEdges) {
+		if(linearEdges)
+			linearEdges(g,size,size,G);
+		else
+			circularEdges(g,size,size,G);
+	}	
+//======================================================================================
+//Draw graph with linear edges
+//======================================================================================
 	public static void linearEdges(Graphics g, int w, int h, Graph G) {
 		
-		g.setColor(Color.WHITE);
-        g.fillRect(0, 0, w, h);
-        g.setColor(Color.BLACK);
+		//clear the drawing area
+		g.clearRect(0,0,w,h);
 		
 		ArrayList<Node> nodes = G.nodes();
+		double[][] oldPositions = new double [nodes.size()][2];
 		ArrayList<int[]> edges = G.edges();
 		int radius = getRadius(g, G);
 		
@@ -22,55 +35,133 @@ public abstract class GraphDrawer {
 			h=w;
 		else
 			w=h;
-		for(Node node: nodes) {
-			double newX = node.x();
-			double newY = node.y();
-			newX*=(0.8*w);
-			newX += (0.1*w);
-			newY*=(0.8*w);
-			newY += (0.1*w);
-			node.setPosition(newX, newY);
+		for(int i = 0; i < nodes.size(); i++) {
+			//set node to new position
+			double oldX = nodes.get(i).x();
+			double oldY = nodes.get(i).y();
+			oldPositions[i][0] = oldX;
+			oldPositions[i][1] = oldY;
+			double newX = 0.8*w*oldX + 0.1*w;
+			double newY = 0.8*w*oldY + 0.1*w;
+			nodes.get(i).setPosition(newX, newY);
+			//draw node
+			drawNode(g, nodes.get(i), radius);
+			System.out.println("(" + nodes.get(i).x() + "," + nodes.get(i).y() + ")");
 		}
 		
-		for(Node node: nodes) {
-			drawNode(g, node, radius);
-			System.out.println("(" + node.x() + "," + node.y() + ")");
-			
+		//draw edges
+		for(int[] edge: edges)
+			drawLinearEdge(g,G,edge);
+		
+		//set nodes back
+		for(int i = 0; i < nodes.size(); i++) {
+			nodes.get(i).setPosition(oldPositions[i][0], oldPositions[i][1]);
 		}
-		for(int[] edge: edges) {
-				Graphics2D g1 = (Graphics2D) g.create();
-				int x1 = (int)nodes.get(edge[0]).x();
-				int y1 = (int)nodes.get(edge[0]).y();
-				int x2 = (int)nodes.get(edge[1]).x();
-				int y2 = (int)nodes.get(edge[1]).y();
-			
-				int dx = x2 - x1, dy = y2 - y1;
-                double angle = Math.atan2(dy, dx);
-                int len = (int) Math.sqrt(dx*dx + dy*dy)-radius;
-                AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
-                at.concatenate(AffineTransform.getRotateInstance(angle));
-                g1.transform(at);
-
-                g1.drawLine(0, 0, len, 0);
-                g1.fillPolygon(new int[] {len, len-ARR_SIZE, len-ARR_SIZE, len},
-                              new int[] {0, -ARR_SIZE, ARR_SIZE, 0}, 4);
-          }
-	};
-	
-	public static void circularEdges(Graphics g, Graph G) {
-		
-	};
-	
-	private static void drawNode(Graphics g, Node n, int radius) {
-		
-		g.fillOval((int)n.x() - radius, (int)n.y() - radius, 2 * radius, 2 * radius);
-
 	}
-	
+//======================================================================================
+		private static void drawLinearEdge(Graphics g, Graph G, int[] edge) {
+			ArrayList<Node> nodes = G.nodes();
+			Graphics2D g1 = (Graphics2D) g.create();
+			int radius = getRadius(g, G);
+			
+			double x1 = nodes.get(edge[0]).x();
+			double y1 = nodes.get(edge[0]).y();
+			double x2 = nodes.get(edge[1]).x();
+			double y2 = nodes.get(edge[1]).y();
+		
+			double dx = x2 - x1, dy = y2 - y1;
+	        double angle = Math.atan2(dy, dx);
+	        int len = (int) Math.sqrt(dx*dx + dy*dy)-radius;
+	        AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
+	        at.concatenate(AffineTransform.getRotateInstance(angle));
+	        g1.transform(at);
+
+	        g1.drawLine(0, 0, len, 0);
+	        g1.fillPolygon(new int[] {len, len-ARR_SIZE, len-ARR_SIZE, len},
+	                      new int[] {0, -ARR_SIZE, ARR_SIZE, 0}, 4);
+		}
+//======================================================================================
+//Draw graph with circular edges
+//======================================================================================
+	public static void circularEdges(Graphics g, int w, int h, Graph G) {
+		g.clearRect(0,0,w,h);
+		
+		ArrayList<Node> nodes = G.nodes();
+		double[][] oldPositions = new double [nodes.size()][2];
+		ArrayList<int[]> edges = G.edges();
+		int radius = getRadius(g, G);
+		
+		//scaling the unit square accordingly
+		if(w<h)
+			h=w;
+		else
+			w=h;
+		for(int i = 0; i < nodes.size(); i++) {
+			//set node to new position
+			double oldX = nodes.get(i).x();
+			double oldY = nodes.get(i).y();
+			oldPositions[i][0] = oldX;
+			oldPositions[i][1] = oldY;
+			double newX = 0.8*w*oldX + 0.1*w;
+			double newY = 0.8*w*oldY + 0.1*w;
+			nodes.get(i).setPosition(newX, newY);
+			//draw node
+			drawNode(g, nodes.get(i), radius);
+			System.out.println("(" + nodes.get(i).x() + "," + nodes.get(i).y() + ")");
+		}
+		
+		//draw edges
+		for(int[] edge: edges)
+			if(Math.abs(edge[0]-edge[1]) < 2)
+				drawLinearEdge(g,G,edge);
+			else
+				drawCircularEdge(g,G,edge);
+		
+		//set nodes back
+		for(int i = 0; i < nodes.size(); i++) {
+			nodes.get(i).setPosition(oldPositions[i][0], oldPositions[i][1]);
+		}
+			
+	}
+//======================================================================================
+	private static void drawCircularEdge(Graphics g, Graph G, int[] edge) {
+		ArrayList<Node> nodes = G.nodes();
+		Graphics2D g2d = (Graphics2D) g.create();
+		int radius = getRadius(g, G);
+		
+		double x1 = nodes.get(edge[0]).x();
+		double y1 = nodes.get(edge[0]).y()-radius;
+		double x2 = nodes.get(edge[1]).x();
+		double y2 = nodes.get(edge[1]).y()-radius;
+		
+		int diameter = (int)Math.abs(x2-x1);
+		double angle = Math.atan2(0, diameter);
+		if(x1 < x2) {
+			g2d.translate(x1, y1);
+	        g2d.drawArc(0, -diameter/2, diameter, diameter, 0, 180);
+	        g2d.translate(x2-x1, y2-y1);
+	        g2d.rotate(angle);
+		}
+	    else {
+	        g2d.translate(x2,y2);
+	        g2d.rotate(angle);
+	        g2d.drawArc(0, -diameter/2, diameter, diameter, 0, 180);
+	    }
+	    g2d.fill(new Polygon(new int[] {0,ARR_SIZE,-ARR_SIZE}, new int[] {0,-ARR_SIZE,-ARR_SIZE}, 3));
+	    g2d.rotate(-angle);
+	    g2d.translate(-x2, -y2);
+	}		
+//======================================================================================
+//Auxiliary functions
+//======================================================================================
+	private static void drawNode(Graphics g, Node n, int radius) {
+		g.fillOval(((int)(n.x())) - radius, ((int)(n.y())) - radius, 2 * radius, 2 * radius);
+	}
+//======================================================================================
 	private static int getRadius(Graphics g, Graph G) {
 		return 10;
-	}
-	
+	}	
+//======================================================================================
 	public static void linearEdgesAntiAliasing(Graphics g, int w, int h, Graph G) {
 
 		ArrayList<Node> nodes = G.nodes();
@@ -117,7 +208,7 @@ public abstract class GraphDrawer {
 			//TODO
 		}
 	};
-	
+//======================================================================================	
 	//Some additional (needed) functions for drawing a line
 	private static void drawLine(Graphics2D g, double x0, double y0, double x1, double y1) {
 		boolean steep = (Math.abs(y1 - y0) > Math.abs(x1 - x0));
@@ -188,6 +279,7 @@ public abstract class GraphDrawer {
 			intery += gradient;
 		}
 	}
+//======================================================================================
 	
 	private static double fpart(double x) {
 		if (x < 0)
@@ -195,17 +287,15 @@ public abstract class GraphDrawer {
 		else
 			return (x - Math.floor(x));
 	}
-
+//======================================================================================
 	private static double rfpart(double x) {
 		return (1 - fpart(x));
 	}
-	
+//======================================================================================
 	// Draws a single Black(!) point at position (x,y) with brightness c (from 0 to 1)
 	private static void drawPoint(Graphics2D g, int x, int y, double c) {
 		g.setColor(new Color(0f, 0f, 0f, (float) c));
 		g.drawLine(x, y, x, y);
 	}
-	
-	
 	
 }
