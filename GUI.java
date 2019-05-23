@@ -118,7 +118,7 @@ public class GUI {
 				        	txtrInputFromFile.setText(txtrInputFromFile.getText() + line + "\n");
 				        	line = in.readLine();	
 				        }
-				        GridEmbedding.defineLayout(drawingArea.getWidth(), drawingArea.getHeight(), G);
+				        SpectralEmbedding.defineLayout(G);
 				        GraphDrawer.drawGraph(drawingArea.getGraphics(),G,drawingArea.getWidth(),linearEdges);
 				        
 				    } catch (Exception ex) {
@@ -147,10 +147,9 @@ public class GUI {
 		JMenuItem mntmGridEmbedding = new JMenuItem("Grid embedding");
 		mntmGridEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("The algorithm has to be adapted to work on the unit square!");
 				linearEdges = true;
-				//GridEmbedding.defineLayout(G);
-		        //GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+				GridEmbedding.defineLayout(G);
+		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 			}
 		});
 		mnLayout.add(mntmGridEmbedding);
@@ -174,6 +173,36 @@ public class GUI {
 			}
 		});
 		mnLayout.add(mntmSpectralEmbedding);
+		
+		JMenuItem mntmSpringEmbedding = new JMenuItem("Spring embedding");
+		mntmSpringEmbedding.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				linearEdges = true;
+				AdaptiveSpringEmbedding.defineLayout(G);
+		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+			}
+		});
+		mnLayout.add(mntmSpringEmbedding);
+		
+		JMenuItem mntmSpringEmbeddingAnimation = new JMenuItem("Spring embedding (animated)");
+		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				linearEdges = true;
+				for(int i=1; i<200; i++) {
+					if(i>100)
+						i+=2;
+					AdaptiveSpringEmbedding.defineLayout(G, i);
+			        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+			        try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		mnLayout.add(mntmSpringEmbeddingAnimation);
 		frmGraphDrawing.getContentPane().setLayout(null);
 		drawingArea.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 //===========================================================================================
