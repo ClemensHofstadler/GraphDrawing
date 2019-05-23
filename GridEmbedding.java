@@ -1,72 +1,61 @@
 
 public class GridEmbedding {
-	
-	public static void defineLayout(int width, int height, Graph G) {
-		defineLayout(width, height, G, 2);
+
+	public static void defineLayout(Graph G) {
+		int n = 1 + (int) Math.sqrt(G.nodes().size());
+		defineLayout(G, n);
 	};
-	
-	public static void defineLayout(int width, int height, Graph G, int nodesPerRow) {
-		int nodesPerColumn = G.nodes().size()/nodesPerRow;
-		if(G.nodes().size()%nodesPerRow>0)
-			nodesPerColumn++;
-		
-		double dx = (width/(nodesPerRow+1.));
-		double dy = (height/(nodesPerColumn+1.));
-		
-		int row = 1;
-		int column = 1;
-		
-		for(Node node: G.nodes()) {
-			System.out.println(node.name());
-			node.setPosition((int) (row*dx), (int) (column*dy));
-			row++;
-			if(row > nodesPerRow) {
-				row = 1;
+
+	public static void defineLayout(Graph G, int nodesPerRow) {
+		int size = G.nodes().size();
+
+		// Special case: only one node
+		if (size == 1) {
+			G.nodes().get(0).setPosition(0.5, 0.5);
+			return;
+		}
+
+		// Special case: one node per row
+		if (nodesPerRow == 1) {
+			int row = 1;
+			double dy = 1. / (size - 1);
+			for (Node node : G.nodes()) {
+				node.setPosition(0.5, (row - 1) * dy);
+				row++;
+			}
+			return;
+		}
+
+		// Special case: all nodes in one row
+		if (nodesPerRow >= size) {
+			int column = 1;
+			double dx = 1. / (size - 1);
+			for (Node node : G.nodes()) {
+				node.setPosition((column - 1) * dx, 0.5);
 				column++;
 			}
+			return;
 		}
-		
-		scaleToUnitSquare(G);
+
+		int nodesPerColumn = G.nodes().size() / nodesPerRow;
+		if (G.nodes().size() % nodesPerRow > 0)
+			nodesPerColumn++;
+
+		double dx = (1. / (nodesPerRow - 1.));
+		double dy = (1. / (nodesPerColumn - 1.));
+		if (dx > dy)
+			dx = dy;
+
+		int column = 1;
+		int row = 1;
+
+		for (Node node : G.nodes()) {
+			node.setPosition((column - 1) * dx, (row - 1) * dx);
+			column++;
+			if (column > nodesPerRow) {
+				column = 1;
+				row++;
+			}
+		}
 	};
-	
-	private static void scaleToUnitSquare(Graph G){
-		
-		double minX = G.nodes().get(0).x();
-		for (Node node : G.nodes())
-			if (node.x() < minX)
-				minX = node.x();
-		double maxX = G.nodes().get(0).x();
-		for (Node node : G.nodes())
-			if (node.x() > maxX)
-				maxX = node.x();
-		double minY = G.nodes().get(0).y();
-		for (Node node : G.nodes())
-			if (node.y() < minY)
-				minY = node.y();
-		double maxY = G.nodes().get(0).y();
-		for (Node node : G.nodes())
-			if (node.y() > maxY)
-				maxY = node.y();
-		
-		double dx = maxX-minX;
-		double dy = maxY-minY;
-		
-		if(dx>dy)
-			dy=dx;
-		else
-			dx=dy;
-		
-		for(Node node: G.nodes()) {
-			double newX = node.x();
-			double newY = node.y();
-			
-			newX-=minX;
-			newX/=dx;
-			newY-=minY;
-			newY/=dy;
-			
-			node.setPosition(newX, newY);
-		}
-	}
-	
 }
