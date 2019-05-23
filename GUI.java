@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.JFileChooser;
@@ -29,6 +30,7 @@ public class GUI {
 	Graph G;
 	private boolean linearEdges = true;
 	private JFrame frmGraphDrawing;
+	private Node markedNode;
 //===========================================================================================
 	/**
 	 * Launch the application.
@@ -118,6 +120,7 @@ public class GUI {
 				        	txtrInputFromFile.setText(txtrInputFromFile.getText() + line + "\n");
 				        	line = in.readLine();	
 				        }
+				        markedNode = null;
 				        SpectralEmbedding.defineLayout(G);
 				        GraphDrawer.drawGraph(drawingArea.getGraphics(),G,drawingArea.getWidth(),linearEdges);
 				        
@@ -138,6 +141,7 @@ public class GUI {
 		mntmRandomEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = true;
+				markedNode = null;
 				RandomEmbedding.defineLayout(G);
 		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 			}
@@ -148,6 +152,7 @@ public class GUI {
 		mntmGridEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = true;
+				markedNode = null;
 				GridEmbedding.defineLayout(G);
 		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 			}
@@ -158,6 +163,7 @@ public class GUI {
 		mntmLinearEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = false;
+				markedNode = null;
 				LinearEmbedding.defineLayout(G);
 				GraphDrawer.drawGraph(drawingArea.getGraphics(),G,drawingArea.getWidth(),linearEdges);
 			}
@@ -168,6 +174,7 @@ public class GUI {
 		mntmSpectralEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = true;
+				markedNode = null;
 				SpectralEmbedding.defineLayout(G);
 		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 			}
@@ -178,6 +185,7 @@ public class GUI {
 		mntmSpringEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = true;
+				markedNode = null;
 				AdaptiveSpringEmbedding.defineLayout(G);
 		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
 			}
@@ -188,6 +196,7 @@ public class GUI {
 		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				linearEdges = true;
+				markedNode = null;
 				for(int i=1; i<200; i++) {
 					if(i>100)
 						i+=2;
@@ -230,10 +239,27 @@ public class GUI {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(G != null && !G.nodes().isEmpty()) {
-					Point pt = e.getPoint();
-					Node n = G.nearestNode(pt.x/(double)(drawingArea.getWidth()), pt.y/(double)(drawingArea.getHeight()));
-					System.out.println("Mouse clicked at position:" + pt);
-					System.out.println("Nearest node:" + n.name());
+					Point pt = e.getPoint();					
+					int w = drawingArea.getWidth();
+					int h = drawingArea.getHeight();
+					Node n = GraphDrawer.nearestNode(G, pt.getX(), pt.getY(), w, h);
+					double distance = GraphDrawer.distanceToNode(n, pt.getX(), pt.getY(), w, h);
+					Graphics g = drawingArea.getGraphics();
+					
+					if(markedNode != null) {
+						GraphDrawer.unmarkNode(g, w, h, markedNode);
+						//GraphDrawer.unmarkAdjacentNodes(g, w, h, markedNode, G);
+					}
+					
+					if(distance < 12) {
+						GraphDrawer.markNode(g, w, h, n);
+						//GraphDrawer.markAdjacentNodes(g, w, h, n, G);
+						markedNode = n;
+						System.out.println("Clicked on node with name: " +n.name());
+					}
+					else {
+						System.out.println("Clicked outside of graph");
+					}
 			}
 		}
 		});
