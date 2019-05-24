@@ -27,7 +27,7 @@ public class AdaptiveSpringEmbedding {
 // Stops after at most maxIter number of iterations.
 //===========================================================================================
 	public static void defineLayout(Graph G, int maxIter) {
-		GridEmbedding.defineLayout(G);
+		//GridEmbedding.defineLayout(G);
 
 		ArrayList<Node> nodes = G.nodes();
 		int numberOfNodes = nodes.size();

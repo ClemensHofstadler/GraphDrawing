@@ -39,8 +39,11 @@ public class Graph {
 			return;
 		
 		int[] edge = {from,to};
-		if(!edges.contains(edge))
-			edges.add(edge);
+		for(int[] e: edges)
+			if(e[0] == edge[0] && e[1] == edge[1])
+				return;
+	
+		edges.add(edge);
 	}
 	
 	public ArrayList<Node> nodes(){
@@ -63,6 +66,26 @@ public class Graph {
 			}
 		}
 		return n;
+	}
+	
+	public ArrayList<Integer> outEdges(Node n) {
+		ArrayList<Integer> out = new ArrayList<Integer>();
+		int index = nodes.indexOf(n);
+		for(int[] edge: edges) 
+			if(edge[0] == index) {
+				out.add(edge[1]);
+			}
+		return(out);
+	}
+
+	public ArrayList<Integer> inEdges(Node n) {
+		ArrayList<Integer> in = new ArrayList<Integer>();
+		int index = nodes.indexOf(n);
+		for(int[] edge: edges) 
+			if(edge[1] == index) {
+				in.add(edge[0]);
+			}
+		return(in);
 	}
 
 }
