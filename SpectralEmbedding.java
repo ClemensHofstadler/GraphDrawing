@@ -23,7 +23,7 @@ public class SpectralEmbedding {
 		
 		//Determine eigenvectors for the 2 largest eigenvalues
 		//of the Lagrangian
-		Matrix L = degreeMatrix(G).minus(adjacencyMatrix(G));
+		Matrix L = degreeMatrix(G).minus(adjacencyMatrix(G));		
 		double[][] eig = getMaxEigenvectors(L);
 		
 		//Determine min and max values appearing in the eigenvectors
@@ -43,7 +43,6 @@ public class SpectralEmbedding {
 		for(int i = 0; i < G.nodes().size(); i++) {
 			double x = (eig[0][i] - minX)/(maxX - minX);
 			double y = (eig[1][i] - minY)/(maxY - minY);
-		
 			G.nodes().get(i).setPosition(x, y);
 		}
 	}
@@ -65,7 +64,7 @@ public class SpectralEmbedding {
 	
 	/**
 	 * Computes the degree matrix of the Graph G. i.e. a diagonal matrix where the
-	 * i-th diagonal element is the out-degree of the i-th node of G.
+	 * i-th diagonal element is the degree of the i-th node of G.
 	 * 
 	 * @param G A graph.
 	 * @return The degree matrix of G.
@@ -73,9 +72,11 @@ public class SpectralEmbedding {
 	private static Matrix degreeMatrix(Graph G) {
 		int n = G.nodes().size();
 		Matrix D = new Matrix(n,n);
-		for(int[] edge: G.edges())
+		for(int[] edge: G.edges()) {
 			D.set(edge[0], edge[0], D.get(edge[0],edge[0]) + 1);
-	
+			if(edge[0] != edge[1])
+				D.set(edge[1], edge[1], D.get(edge[1],edge[1]) + 1);
+		}
 		return D;
 	}
 	
@@ -95,9 +96,10 @@ public class SpectralEmbedding {
 		double [] realEig = eig.getRealEigenvalues();
 		double [] imEig = eig.getImagEigenvalues();
 		double [] abs = new double[imEig.length];
-		for(int i = 0; i < abs.length; i++)
+		for(int i = 0; i < abs.length; i++) {
 			abs[i] = realEig[i]*realEig[i] + imEig[i]*imEig[i];
-	
+		}
+		
 		//get position of largest eigenvalue
 		int max = 0;
 		for(int i = 0; i < abs.length; i++)

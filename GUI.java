@@ -22,13 +22,16 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.border.BevelBorder;
 import java.awt.GridLayout;
+import javax.swing.SwingConstants;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
+import javax.swing.JButton;
 
 public class GUI {
 //===========================================================================================
 //Fields
 //===========================================================================================
 	Graph G;
-	private boolean linearEdges = true;
 	private JFrame frmGraphDrawing;
 	private Node markedNode;
 //===========================================================================================
@@ -67,23 +70,28 @@ public class GUI {
 		settingsArea.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		JMenuBar menuBar = new JMenuBar();
 		JMenu mnLoad = new JMenu("Load");
-		JTextArea txtrInputFromFile = new JTextArea();
-		JPanel drawingArea = new JPanel();
+		JTextArea infoField = new JTextArea();
+		infoField.setEditable(false);
+		DrawingArea drawingArea = new DrawingArea();
 		JMenu mnLayout = new JMenu("Layout");
+		JLabel lblSettings = new JLabel("Settings");
+		JButton saveButton = new JButton("Save as png");
+		JPanel panel = new JPanel();
 //===========================================================================================
 //Resizing of the components
 //===========================================================================================
-		frmGraphDrawing.getContentPane().addComponentListener(new ComponentAdapter() {
+		 	frmGraphDrawing.getContentPane().addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
+				//get new size
 				int width = frmGraphDrawing.getWidth()-12;
 				int height = frmGraphDrawing.getHeight() - 56;
 				int size = width < height ? width : height;
-				drawingArea.setSize(size, size);
+				//resize settings area
 				settingsArea.setBounds(size+12, 6, width-(size+6), height);
-				try {
-					GraphDrawer.drawGraph(drawingArea.getGraphics(),G,size,linearEdges);
-				}catch(Exception ex) {System.out.println("Error");}
+				//resize and redraw graph
+				drawingArea.setSize(size);
+				drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		frmGraphDrawing.setTitle("Graph Drawing");
@@ -91,6 +99,16 @@ public class GUI {
 		frmGraphDrawing.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
 		
 		frmGraphDrawing.setJMenuBar(menuBar);
+//===========================================================================================
+//Zooming TODO
+//===========================================================================================	
+		drawingArea.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				double x = e.getPoint().x/(double)drawingArea.sizeDrawing();
+				double y = e.getPoint().y/(double)drawingArea.sizeDrawing();
+				drawingArea.zoom(e.getPreciseWheelRotation(),x,y);
+			}
+		});
 //===========================================================================================
 //Read in a file
 //===========================================================================================
@@ -108,7 +126,7 @@ public class GUI {
 				    	
 				    	G = new Graph();
 				    	
-				    	txtrInputFromFile.setText("");
+				    	infoField.setText("");
 				        String line = in.readLine();
 				        while (line != null) {
 				        	int space = line.indexOf(' ');
@@ -117,17 +135,18 @@ public class GUI {
 				        	G.addNode(n1);
 				        	G.addNode(n2);
 				        	G.addEdge(n1,n2);
-				        	txtrInputFromFile.setText(txtrInputFromFile.getText() + line + "\n");
+				        	infoField.setText(infoField.getText() + line + "\n");
 				        	line = in.readLine();	
 				        }
-				        markedNode = null;
-				        SpectralEmbedding.defineLayout(G);
-				        GraphDrawer.drawGraph(drawingArea.getGraphics(),G,drawingArea.getWidth(),linearEdges);
-				        
+						drawingArea.reset();
+				        GridEmbedding.defineLayout(G);
+				        drawingArea.setGraph(G);
+				        drawingArea.setLinearEdges(true);
+				        drawingArea.paint(drawingArea.getGraphics());
+				            
 				    } catch (Exception ex) {
 				    	ex.printStackTrace();
 				    }
-				   
 				}
 			}
 			});
@@ -140,10 +159,11 @@ public class GUI {
 		JMenuItem mntmRandomEmbedding = new JMenuItem("Random embedding");
 		mntmRandomEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = true;
-				markedNode = null;
+				drawingArea.reset();
 				RandomEmbedding.defineLayout(G);
-		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmRandomEmbedding);
@@ -151,10 +171,11 @@ public class GUI {
 		JMenuItem mntmGridEmbedding = new JMenuItem("Grid embedding");
 		mntmGridEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = true;
-				markedNode = null;
+				drawingArea.reset();
 				GridEmbedding.defineLayout(G);
-		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmGridEmbedding);
@@ -162,10 +183,11 @@ public class GUI {
 		JMenuItem mntmLinearEmbedding = new JMenuItem("Linear embedding");
 		mntmLinearEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = false;
-				markedNode = null;
+				drawingArea.reset();
 				LinearEmbedding.defineLayout(G);
-				GraphDrawer.drawGraph(drawingArea.getGraphics(),G,drawingArea.getWidth(),linearEdges);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(false);
+		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmLinearEmbedding);
@@ -173,10 +195,11 @@ public class GUI {
 		JMenuItem mntmSpectralEmbedding = new JMenuItem("Spectral embedding");
 		mntmSpectralEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = true;
-				markedNode = null;
+				drawingArea.reset();
 				SpectralEmbedding.defineLayout(G);
-		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmSpectralEmbedding);
@@ -184,10 +207,11 @@ public class GUI {
 		JMenuItem mntmSpringEmbedding = new JMenuItem("Spring embedding");
 		mntmSpringEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = true;
-				markedNode = null;
+				drawingArea.reset();
 				AdaptiveSpringEmbedding.defineLayout(G);
-		        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmSpringEmbedding);
@@ -195,13 +219,14 @@ public class GUI {
 		JMenuItem mntmSpringEmbeddingAnimation = new JMenuItem("Spring embedding (animated)");
 		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				linearEdges = true;
-				markedNode = null;
+				drawingArea.reset();
+		        drawingArea.setLinearEdges(true);
 				for(int i=1; i<200; i++) {
 					if(i>100)
 						i+=2;
 					AdaptiveSpringEmbedding.defineLayout(G, i);
-			        GraphDrawer.linearEdges(drawingArea.getGraphics(), drawingArea.getWidth(), drawingArea.getHeight(), G);
+					drawingArea.setGraph(G);
+			        drawingArea.paint(drawingArea.getGraphics());
 			        try {
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
@@ -212,8 +237,35 @@ public class GUI {
 			}
 		});
 		mnLayout.add(mntmSpringEmbeddingAnimation);
+		
+		JMenuItem mntmCircularEmbedding = new JMenuItem("Circular embedding");
+		mntmCircularEmbedding.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CircularEmbedding.defineLayout(G);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
+			}
+		});
+		mnLayout.add(mntmCircularEmbedding);
+		
+		
+		
 		frmGraphDrawing.getContentPane().setLayout(null);
-		drawingArea.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		drawingArea.setBorder(null);
+//===========================================================================================
+//Save as picture
+//===========================================================================================
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				int val = fileChooser.showSaveDialog(frmGraphDrawing);
+				if (val == JFileChooser.APPROVE_OPTION) 
+					drawingArea.save(fileChooser.getSelectedFile());
+			}
+		});
+		saveButton.setBounds(45, 40, 117, 29);
+		panel.add(saveButton);
 //===========================================================================================
 //Auxiliary functions
 //===========================================================================================
@@ -224,17 +276,21 @@ public class GUI {
 		settingsArea.setBounds(360, 6, 200, 350);
 		frmGraphDrawing.getContentPane().add(settingsArea);
 		settingsArea.setLayout(new GridLayout(0, 1, 0, 0));
-				JLabel lblSettings = new JLabel("Settings");
-				settingsArea.add(lblSettings);
+		lblSettings.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSettings.setHorizontalTextPosition(SwingConstants.CENTER);
+		settingsArea.add(lblSettings);
 		
-				txtrInputFromFile.setLineWrap(true);
-				txtrInputFromFile.setWrapStyleWord(true);
-				txtrInputFromFile.setText("Input from file will be shown here");
-				settingsArea.add(txtrInputFromFile);
+		infoField.setLineWrap(true);
+		infoField.setWrapStyleWord(true);
+		infoField.setText("Click on a node for more information");
+		settingsArea.add(infoField);
+		
+		settingsArea.add(panel);
+		panel.setLayout(null);
+		
 //===========================================================================================
 //Functionality to click on nodes
 //===========================================================================================
-
 		drawingArea.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -245,17 +301,32 @@ public class GUI {
 					Node n = GraphDrawer.nearestNode(G, pt.getX(), pt.getY(), w, h);
 					double distance = GraphDrawer.distanceToNode(n, pt.getX(), pt.getY(), w, h);
 					Graphics g = drawingArea.getGraphics();
-					
+							
 					if(markedNode != null) {
 						GraphDrawer.unmarkNode(g, w, h, markedNode);
 						//GraphDrawer.unmarkAdjacentNodes(g, w, h, markedNode, G);
 					}
-					
+							
 					if(distance < 12) {
 						GraphDrawer.markNode(g, w, h, n);
 						//GraphDrawer.markAdjacentNodes(g, w, h, n, G);
 						markedNode = n;
-						System.out.println("Clicked on node with name: " +n.name());
+						String text = "Node name: " + n.name() + "\n";
+						String out = "";
+						for(int i: G.outEdges(n)) {
+							if(out != "")
+							out += ", ";
+							out += G.nodes().get(i).name();
+						}
+						text += "Outgoing edges to: " + out + "\n";
+						String in = "";
+						for(int i: G.inEdges(n)) {
+							if(in != "")
+							in += ", ";
+							in += G.nodes().get(i).name();
+						}
+						text += "Incoming edges from: " + in + "\n";
+						infoField.setText(text);					
 					}
 					else {
 						System.out.println("Clicked outside of graph");
@@ -265,4 +336,3 @@ public class GUI {
 		});
 	}
 }
-
