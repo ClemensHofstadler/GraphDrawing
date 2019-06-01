@@ -26,7 +26,24 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.JButton;
-
+import java.awt.event.MouseMotionAdapter;
+/**
+ * Graphical user interface to draw graphs in different layouts.
+ * Graphs are loaded from a txt-file and can be visualized with the
+ * following layouts:
+ * <ul>
+ * 	<li> {@link RandomEmbedding RandomEmbedding}
+ * 	<li> {@link SpectralEmbedding SpectralEmbedding}
+ * 	<li> {@link LinearEmbedding LinearEmbedding}
+ * 	<li> {@link CircularEmbedding CircularEmbedding}
+ * 	<li> {@link SpringEmbedding AdaptiveSpringEmbedding}
+ * 	<li> {@link GridEmbedding GridEmbedding}
+ * </ul>
+ * 
+ * @author Clemens Hofstadler, Lukas Wögerer
+ * @version 1.0.0, 31st May 2019
+ *
+ */
 public class GUI {
 //===========================================================================================
 //Fields
@@ -37,6 +54,8 @@ public class GUI {
 //===========================================================================================
 	/**
 	 * Launch the application.
+	 * 
+	 * @param args Can be ignored.
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -298,19 +317,22 @@ public class GUI {
 					Point pt = e.getPoint();					
 					int w = drawingArea.getWidth();
 					int h = drawingArea.getHeight();
-					Node n = GraphDrawer.nearestNode(G, pt.getX(), pt.getY(), w, h);
-					double distance = GraphDrawer.distanceToNode(n, pt.getX(), pt.getY(), w, h);
-					Graphics g = drawingArea.getGraphics();
+					double x = drawingArea.realX(pt.getX());
+					double y = drawingArea.realY(pt.getY());
+					Node n = GraphDrawer.nearestNode(G, x, y, w, h);
+					double distance = GraphDrawer.distanceToNode(n,x, y, w, h);
 							
 					if(markedNode != null) {
-						GraphDrawer.unmarkNode(g, w, h, markedNode);
+						GraphDrawer.unmarkNode(markedNode);
 						//GraphDrawer.unmarkAdjacentNodes(g, w, h, markedNode, G);
 					}
-							
-					if(distance < 12) {
-						GraphDrawer.markNode(g, w, h, n);
+			
+					if(distance < 0.03*drawingArea.sizeDrawing()) {
+						GraphDrawer.markNode(n);
 						//GraphDrawer.markAdjacentNodes(g, w, h, n, G);
 						markedNode = n;
+						
+						//print information for the user
 						String text = "Node name: " + n.name() + "\n";
 						String out = "";
 						for(int i: G.outEdges(n)) {
@@ -331,8 +353,10 @@ public class GUI {
 					else {
 						System.out.println("Clicked outside of graph");
 					}
+					
+					drawingArea.paint(drawingArea.getGraphics());
+				}
 			}
-		}
 		});
 	}
 }

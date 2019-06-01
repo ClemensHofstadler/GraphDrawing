@@ -1,18 +1,20 @@
-import java.awt.Graphics;
-
+import java.awt.Color;
 public class Node {
 
 	private String name;
 	private double[] position;
+	private Color c;
 
 	Node(String name_, double[] position_) {
 		name = name_;
 		position = position_;
+		c = Color.BLACK;
 	}
 
 	Node(String name_) {
 		name = name_;
 		position = new double[] {0, 0};
+		c = Color.BLACK;
 	}
 
 	public String name() {
@@ -21,6 +23,14 @@ public class Node {
 
 	public double[] position() {
 		return position;
+	}
+	
+	public Color color() {
+		return c;
+	}
+	
+	public void setColor(Color c) {
+		this.c = c;
 	}
 
 	public void setPosition(double x, double y) {
