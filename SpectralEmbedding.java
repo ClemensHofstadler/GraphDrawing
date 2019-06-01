@@ -7,12 +7,11 @@ import Jama.Matrix;
  * corresponding to the largest eigenvalues of the Lagrangian matrix of 
  * the graph.
  * 
- * @author clemenshofstadler
- * @version 1.0.0
+ * @author Clemens Hofstadler
+ * @version 1.0.0, 31st May 2019
  *
  */
 public class SpectralEmbedding {
-	
 	/**
 	 * Aligns the nodes of a graph G on the unit square
 	 * according to a spectral embedding.
@@ -64,7 +63,8 @@ public class SpectralEmbedding {
 	
 	/**
 	 * Computes the degree matrix of the Graph G. i.e. a diagonal matrix where the
-	 * i-th diagonal element is the degree of the i-th node of G.
+	 * i-th diagonal element is the degree of the i-th node of G, where G is considered
+	 * as an undirected graph.
 	 * 
 	 * @param G A graph.
 	 * @return The degree matrix of G.
@@ -82,10 +82,11 @@ public class SpectralEmbedding {
 	
 	/**
 	 * Computes the eigenvectors for the 2 largest eigenvalues
-	 * of M.
+	 * of a matrix M.
 	 * 
+	 * @param M A matrix.
 	 * @return The eigenvectors for the 2 largest eigenvalues 
-	 * of M
+	 * of M.
 	 */
 	private static double[][] getMaxEigenvectors(Matrix M){
 
