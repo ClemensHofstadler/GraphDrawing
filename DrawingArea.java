@@ -16,6 +16,11 @@ public class DrawingArea extends JPanel{
 	public double zoom;
 	public double x;
 	public double y;
+	
+	public double xMoveReference;
+	public double xMoveReferenceScaled;
+	public double yMoveReference;
+	public double yMoveReferenceScaled;
 	/**
 	 * Default constructor. Initializes an empty graph,
 	 * sets the zoom to 1 and the initial position
@@ -26,6 +31,7 @@ public class DrawingArea extends JPanel{
 		G = null;
 		zoom = 1;
 		x = y = 0;
+		xMoveReference = yMoveReference = 0;
 	}
 	
 	/**
@@ -79,15 +85,23 @@ public class DrawingArea extends JPanel{
 			x += dx;
 			y += dy;
 			
-			zoom *= 1.1;
+			zoom *= 1.08;
 		}
 		else if(d < 0)
-			zoom /= 1.1;
+			zoom /= 1.08;
 		
 		if(zoom < 1) {
 			zoom = 1;
 		}
 	
+		paint(getGraphics());
+	}
+	
+	public void move(double xNew, double yNew) {
+		double dx = xMoveReference - xNew;
+		double dy = yMoveReference - yNew;
+		x = xMoveReferenceScaled + dx/zoom;
+		y = yMoveReferenceScaled + dy/zoom;
 		paint(getGraphics());
 	}
 	

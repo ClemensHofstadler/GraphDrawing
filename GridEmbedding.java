@@ -28,12 +28,7 @@ public class GridEmbedding {
 
 		// Special case: all nodes in one row
 		if (nodesPerRow >= size) {
-			int column = 1;
-			double dx = 1. / (size - 1);
-			for (Node node : G.nodes()) {
-				node.setPosition((column - 1) * dx, 0.5);
-				column++;
-			}
+			LinearEmbedding.defineLayout(G);
 			return;
 		}
 

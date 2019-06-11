@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 //===========================================================================================
-//Implements a force-based graph drawing algorithm.
+//Implements an force-based graph drawing algorithm.
 //Edges are considered as springs and Nodes repel each other (like electrical charges).
 //By iterating over all nodes and moving them according to forces acting on them, a stable
 //constellation is sought. In each step the algorithm tries to reduce the total energy of the
@@ -15,19 +15,109 @@ public class AdaptiveSpringEmbedding {
 	static final double t = 0.9;
 	static final int maximumIterations = 1000;
 	static int progress;
+	
+
+	public static boolean iterateOnce(Graph G) {
+
+		ArrayList<Node> nodes = G.nodes();
+		int numberOfNodes = nodes.size();
+		progress = 0;
+
+		boolean converged = false;
+		double step = initialStepLength;
+		double E = Double.MAX_VALUE;
+
+		double E0;
+		double dist;
+		Vector2D force = new Vector2D();
+		Vector2D f = new Vector2D();
+		double[][] oldPositions = new double[numberOfNodes][2];
+
+		for (int i = 0; i < numberOfNodes; i++) {
+			oldPositions[i][0] = nodes.get(i).x();
+			oldPositions[i][1] = nodes.get(i).y();
+		}
+		E0 = E;
+		E = 0.;
+		for (int i = 0; i < nodes.size(); i++) {
+			// find adjacent nodes
+			ArrayList<Integer> posOfAdjacentNodes = new ArrayList<>();
+			for (int[] edge : G.edges()) {
+				if (edge[0] != edge[1]) {
+					if (edge[0] == i) {
+						if (posOfAdjacentNodes.indexOf(edge[1]) == -1)
+							posOfAdjacentNodes.add(edge[1]);
+					} else if (edge[1] == i) {
+						if (posOfAdjacentNodes.indexOf(edge[0]) == -1)
+							posOfAdjacentNodes.add(edge[0]);
+					}
+				}
+			}
+
+			Node node = nodes.get(i);
+			force.setXY(0., 0.);
+			//sum up all attracting forces acting on the current node
+			for (int j : posOfAdjacentNodes) {
+				Node node2 = nodes.get(j);
+				dist = Math.sqrt(Math.pow(node.x() - node2.x(), 2) + Math.pow(node.y() - node2.y(), 2));
+				f.setXY(node2.x() - node.x(), node2.y() - node.y());
+				f.multiply(attractiveForce(dist) / dist);
+				force.add(f);
+			}
+			//add all repelling forces acting on the current node
+			for (int j = 0; j < nodes.size(); j++) {
+				if (i != j) {
+					Node node2 = nodes.get(j);
+					dist = Math.sqrt(Math.pow(node.x() - node2.x(), 2) + Math.pow(node.y() - node2.y(), 2));
+					f.setXY(node2.x() - node.x(), node2.y() - node.y());
+					f.multiply(repulsiveForce(dist) / dist);
+					force.add(f);
+				}
+			}
+			
+			// set new position of current node
+			double magnitude = force.length();
+			if (magnitude > 0) {
+				E += Math.pow(magnitude, 2);
+				force.multiply(step / magnitude);
+				double newX = node.x();
+				newX += force.getCoordinates()[0];
+				double newY = node.y();
+				newY += force.getCoordinates()[1];
+				node.setPosition(newX, newY);
+			}
+		}
+
+		step = updateSteplength(step, E, E0);
+		double measure = 0.;
+		for (int i = 0; i < numberOfNodes; i++) {
+			measure += Math.pow(oldPositions[i][0] - nodes.get(i).x(), 2);
+			measure += Math.pow(oldPositions[i][1] - nodes.get(i).y(), 2);
+		}
+		measure = Math.sqrt(measure);
+		if (measure < K * tol) {
+			converged = true;
+			System.out.println("Converged!");
+		}
+		
+		return converged;
+	}
 
 //===========================================================================================
-// Iterates at most maximumIterations times to find a stable configureation
+// Iterates at most maximumIterations times to find a stable configuration
 //===========================================================================================
-	public static void defineLayout(Graph G) {
-		defineLayout(G, maximumIterations);
+	public static void defineLayout(Graph G, int layoutType) {
+		defineLayout(G, maximumIterations, layoutType);
 	}
 
 //===========================================================================================
 // Stops after at most maxIter number of iterations.
 //===========================================================================================
-	public static void defineLayout(Graph G, int maxIter) {
-		GridEmbedding.defineLayout(G);
+	public static void defineLayout(Graph G, int maxIter, int layoutType) {
+		if(layoutType == 0)
+			GridEmbedding.defineLayout(G);
+		else
+			RandomEmbedding.defineLayout(G);
 
 		ArrayList<Node> nodes = G.nodes();
 		int numberOfNodes = nodes.size();

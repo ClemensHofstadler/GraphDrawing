@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 /**
@@ -23,6 +24,9 @@ public abstract class GraphDrawer {
 	 * Color of a node when the user clicks on it.
 	 */
 	private static final Color markedNodeColor = Color.orange;
+	private static final Color arrowTo = Color.RED;
+	private static final Color arrowFrom = Color.BLUE;
+	private static final Color arrowTwoWay = Color.MAGENTA;
 //======================================================================================
 //Draw graph
 //======================================================================================
@@ -105,11 +109,14 @@ public abstract class GraphDrawer {
 	private static void drawLinearEdge(Graphics g, Graph G, int[] edge, int radius) {
 		ArrayList<Node> nodes = G.nodes();
 		Graphics2D g1 = (Graphics2D) g.create();
+		g1.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
 			
 		double x1 = nodes.get(edge[0]).x();
 		double y1 = nodes.get(edge[0]).y();
 		double x2 = nodes.get(edge[1]).x();
 		double y2 = nodes.get(edge[1]).y();
+		
+		//drawLine(g1, x1, y1, x2, y2);
 		
 		double dx = x2 - x1, dy = y2 - y1;
 	    double angle = Math.atan2(dy, dx);
@@ -185,6 +192,7 @@ public abstract class GraphDrawer {
 	private static void drawCircularEdge(Graphics g, Graph G, int[] edge,int radius) {
 		ArrayList<Node> nodes = G.nodes();
 		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
 		
 		double x1 = nodes.get(edge[0]).x();
 		double y1 = nodes.get(edge[0]).y()-radius;
@@ -244,157 +252,58 @@ public abstract class GraphDrawer {
 	 * @param G The graph that should be drawn.
 	 * @return The radius of the nodes.
 	 */
-	private static int getRadius(int size, Graph G) {
-		int r = (int)(0.9*size/(G.nodes().size()*3));
+	public static int getRadius(int size, Graph G) {
+		//int r = (int)(0.9*size/(G.nodes().size()*3));
+		//int r = (int) Math.sqrt((3.5*size)/G.nodes().size());
+		int r = (int) (size/Math.sqrt(10*Math.PI*G.nodes().size()));
 		return r;
 	}	
 //======================================================================================
-	public static void linearEdgesAntiAliasing(Graphics g, int w, int h, Graph G) {
-
-		ArrayList<Node> nodes = G.nodes();
-		ArrayList<int[]> edges = G.edges();
-		int radius = 10;
-		
-		//scaling the unit square accordingly
-		if(w<h)
-			h=w;
-		else
-			w=h;
-		for(Node node: nodes) {
-			double newX = node.x();
-			double newY = node.y();
-			newX*=(0.8*w);
-			newX += (0.1*w);
-			newY*=(0.8*w);
-			newY += (0.1*w);
-			node.setPosition(newX, newY);
-		}
-		
-		
-		Graphics2D g1 = (Graphics2D) g.create();
-		g.setColor(Color.WHITE);
-        g.fillRect(0, 0, w, h);
-        g.setColor(Color.BLACK);
-        
-        // draw nodes
-        for (Node node : nodes) {
-			drawNode(g, node, radius);
-		}
-        
-		for (int[] edge : edges) {
-			double x0 = nodes.get(edge[0]).x();
-			double y0 = nodes.get(edge[0]).y();
-			double x1 = nodes.get(edge[1]).x();
-			double y1 = nodes.get(edge[1]).y();
-			
-			//draw edges
-			drawLine(g1, x0, y0, x1, y1);
-			
-			// draw tips of arrows
-			
-			//TODO
-		}
-	};
-//======================================================================================	
-	//Some additional (needed) functions for drawing a line
-	private static void drawLine(Graphics2D g, double x0, double y0, double x1, double y1) {
-		boolean steep = (Math.abs(y1 - y0) > Math.abs(x1 - x0));
-
-		if (steep) {
-			double val = x0;
-			x0 = y0;
-			y0 = val;
-
-			val = x1;
-			x1 = y1;
-			y1 = val;
-		}
-
-		if (x0 > x1) {
-			double val = x0;
-			x0 = x1;
-			x1 = val;
-
-			val = y0;
-			y0 = y1;
-			y1 = val;
-		}
-
-		double dx = x1 - x0;
-		double dy = y1 - y0;
-		double gradient = dy / dx;
-
-		// Vorgehen fuer ersten Endpunkt
-		double xend = (int) (x0 + 0.5);
-		double yend = y0 + gradient * (xend - x0);
-		double xgap = rfpart(x0 + 0.5);
-		double xpxl1 = xend;
-		double ypxl1 = (int) yend;
-
-		if (steep) {
-			drawPoint(g, (int) ypxl1, (int) xpxl1, rfpart(yend) * xgap);
-			drawPoint(g, (int) ypxl1 + 1, (int) xpxl1, fpart(yend) * xgap);
-		} else {
-			drawPoint(g, (int) xpxl1, (int) ypxl1, rfpart(yend) * xgap);
-			drawPoint(g, (int) xpxl1, (int) ypxl1 + 1, fpart(yend) * xgap);
-		}
-
-		double intery = yend + gradient;
-		xend = (int) (x1 + 0.5);
-		yend = y1 + gradient * (xend - x1);
-		xgap = fpart(x1 + 0.5);
-		double xpxl2 = xend;
-		double ypxl2 = (int) yend;
-
-		if (steep) {
-			drawPoint(g, (int) ypxl2, (int) xpxl2, rfpart(yend) * xgap);
-			drawPoint(g, (int) ypxl2 + 1, (int) xpxl2, fpart(yend) * xgap);
-		} else {
-			drawPoint(g, (int) xpxl2, (int) ypxl2, rfpart(yend) * xgap);
-			drawPoint(g, (int) xpxl2, (int) ypxl2 + 1, fpart(yend) * xgap);
-		}
-
-		for (double x = (xpxl1 + 1); x <= (xpxl2 - 1); x++) {
-			if(steep) {
-				drawPoint(g, (int)(intery)  , (int)x, rfpart(intery));
-                drawPoint(g, (int)(intery+1), (int)x,  fpart(intery));
-			}
-			else {
-				drawPoint(g, (int)x, (int)(intery),  rfpart(intery));
-                drawPoint(g, (int)x, (int)(intery+1), fpart(intery));
-			}
-			intery += gradient;
-		}
-	}
-//======================================================================================
-	private static double fpart(double x) {
-		if (x < 0)
-			return (1 - (x - Math.floor(x)));
-		else
-			return (x - Math.floor(x));
-	}
-//======================================================================================
-	private static double rfpart(double x) {
-		return (1 - fpart(x));
-	}
-//======================================================================================
-	// Draws a single Black(!) point at position (x,y) with brightness c (from 0 to
-	// 1)
-	private static void drawPoint(Graphics2D g, int x, int y, double c) {
-		g.setColor(new Color(0f, 0f, 0f, (float) c));
-		g.drawLine(x, y, x, y);
-	}
-//======================================================================================
-	public static Node nearestNode(Graph G, double x, double y, double w, double h) {
-		w = Math.min(w, h);
-		return G.nearestNode((x/w-0.1)/0.8, (y/w-0.1)/0.8);
+	public static Node nearestNode(Graph G, double x, double y, double size) {
+		return G.nearestNode((x/size-0.1)/0.8, (y/size-0.1)/0.8);
 	}
 //======================================================================================	
-	public static double distanceToNode(Node n, double x, double y, double w, double h) {
-		w = Math.min(w, h);
-		double nodeNewX = 0.8 * w * n.x() + 0.1 * w;
-		double nodeNewY = 0.8 * w * n.y() + 0.1 * w;
+	public static double distanceToNode(Node n, double x, double y, double size) {
+		double nodeNewX = 0.8 * size * n.x() + 0.1 * size;
+		double nodeNewY = 0.8 * size * n.y() + 0.1 * size;
 		return Math.sqrt(Math.pow(nodeNewX-x, 2)+Math.pow(nodeNewY-y, 2));
+	}
+//======================================================================================
+	public static void markAdjacentNodes(Graph G, Node n) {
+		ArrayList<Integer> outEdges = G.outEdges(n);
+		ArrayList<Integer> inEdges = G.inEdges(n);
+		for(int j=0; j<G.edges().size(); j++) {
+			if(G.nodes().indexOf(n) != j) {
+				if(outEdges.contains(j) && inEdges.contains(j))
+					G.nodes().get(j).setColor(arrowTwoWay);
+				else {
+					if(outEdges.contains(j))
+						G.nodes().get(j).setColor(arrowTo);
+					if(inEdges.contains(j))
+						G.nodes().get(j).setColor(arrowFrom);
+				}
+			}
+		}
+	}
+//======================================================================================
+	public static void unmarkAdjacentNodes(Graph G, Node n) {
+		
+		int i = G.nodes().indexOf(n);
+		ArrayList<Integer> posOfAdjacentNodes = new ArrayList<>();
+		for (int[] edge : G.edges()) {
+			if (edge[0] != edge[1]) {
+				if (edge[0] == i) {
+					if (posOfAdjacentNodes.indexOf(edge[1]) == -1)
+						posOfAdjacentNodes.add(edge[1]);
+				} else if (edge[1] == i) {
+					if (posOfAdjacentNodes.indexOf(edge[0]) == -1)
+						posOfAdjacentNodes.add(edge[0]);
+				}
+			}
+		}
+		for (int j : posOfAdjacentNodes) {
+			G.nodes().get(j).setColor(Color.BLACK);
+		}
 	}
 
 }
