@@ -1,0 +1,106 @@
+<html>
+<head>
+<style type="text/css">
+<!--
+ .tab { margin-left: 10px; }
+-->
+</style>
+</head>
+
+
+<body>
+<h1 class="tab">Graph drawing</h1>
+<p class="tab">
+This is a simple application to visualize graphs using different layout methods. This help page contains some basic information on how to work with this application. The following sections are contained:
+</p>
+<ol>
+  <li>Loading a graph</li>
+  <li>Supported layouts</li>
+  <li>Additional information</li>
+</ol>
+
+<h2 class="tab">Loading a graph</h2>
+<p class="tab">A graph can be loaded using the "Load" field in the menu. Then, a txt-file has to be provided containing the information about the graph. The txt-file has to be of a certain format in order to be compatible with this application:</p>
+<p class="tab">
+Each line of the file must contain two strings seperated by a single whitespace (e.g. <i>Alice</i> <i>Bob</i> or <i>1</i> <i>2</i>). These two strings are then interpreted as nodes of the graph with the given names which are connected by an edge going from the first string to the second one (or in case of undirected graphs just connected by an edge). For example, a valid input file for a graph with three nodes named <i>Alice</i>, <i>Bob</i> and <i>Charly</i>, where there is an edge from <i>Alice</i> to <i>Bob</i>, an edge from <i>Bob</i> to <i>Charly</i> and an edge from <i>Alice</i> to <i>Charly</i> would be:</p>
+
+<p class="tab">Alice Bob<br>
+Bob Charly<br>
+Alice Charly</p>
+
+<h2 class="tab">Supported layouts</h2>
+<p class="tab">The following layouts are available:</p>
+<ul>
+  <li> Circular embedding
+  <li> Grid embedding
+  <li> Layered embedding
+  <li> Linear embedding
+  <li> Random embedding
+  <li> Spectral embedding
+  <li> Spring embedding
+</ul>
+<p class="tab"> For detailled informations on the different layouts, please see the following subsections.</p>
+
+<p class="tab">By default, when a graph is loaded, it will be displayed using the Grid embedding. To switch to a different layout, simply click on the menu field "Layout" and then choose the desired layout.</p>
+
+<h3 class="tab">Circular embedding</h3>
+<p class="tab">The circular embedding aligns all nodes equidistant on a circle centered in the middle of the drawing area. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+</p> 
+
+<h3 class="tab">Grid embedding</h3>
+<p class="tab">The grid embedding aligns all nodes equidistant in form of a grid. The nodes are ordered according to their appearence in the txt-file used to load the graph. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+ </p> 
+
+<h3 class="tab">Layered embedding</h3>
+<p class="tab">The layered embedding is only intended to be used with acyclic graphs. For such graphs, all nodes are aligned on horizontal layers such that all nodes of the graph show downwards and such that the number of total crossings of edges in each layer is minimized. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+</p> 
+
+<h3 class="tab">Linear embedding</h3>
+<p class="tab">With the linear embedding, all nodes of the graph will be aligned on a horizontal line in the middle of the drawing area ordered according to their appearence in the txt-file used to load the graph. Edges between adjacent nodes will be drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph) and edges between nodes further away are drawn as semicircles (which also end in an arrow when working with a directed graph).</p>
+
+<h3 class="tab">Random embedding</h3>
+<p class="tab">
+Using the random embedding, the nodes of the graph will be placed randomly and the edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+</p> 
+
+<h3 class="tab">Spectral embedding</h3>
+<p class="tab">The spectral embedding uses the eigenvectors of the Laplace matrix of the graph as Cartesian coordinates of the graph's nodes. The idea of the layout is to compute the two largest eigenvalues and corresponding eigenvectors of the laplacian matrix of the graph and then the x-coordinate of the i-th node is the value of the i-th coordinate of the first eigenvector. Correspondingly the i-th component of the second eigenvector describes the y-coordinate of the node i. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+</p>
+
+
+<h3 class="tab">Spring embedding</h3>
+<p class="tab">
+The spring embedding implements a force-based graph drawing algorithm.
+Edges are considered as springs and nodes repel each other (like electrical charges).
+Nodes are moved according to forces acting on them, unitl a stable
+constellation is found. The algorithm tries to reduce the total energy of the
+system. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).</p>
+
+
+<h2 class="tab">Additional information</h2>
+
+<p class="tab">In this section, some further functionality provided by this application 
+is listed.
+</p>
+
+<h3 class="tab">Information about the graph</h3>
+<p class="tab">
+When a graph is loaded, in the section to the right of the drawing area some information about the graph is provided. This consists of a listing of the nodes of the graph and its edges. The user can also click on a certain node, in this case the node clicked on will be coloured differently and information about this node will be displayed. This information consists of the name of the node, all outgoing edges as well as all incoming edges.
+</p>
+
+<h3 class="tab">Saving a graph</h3>
+<p class="tab">
+Using the "Save" button to the right of the drawing area, the user can save the currently displayed graph as a png image. Clicking on this button opens a dialog window where the user has to specify the name under which the picture will be saved and where the picture should be saved. 
+</p>
+
+<h3 class="tab">Zooming & Dragging</h3>
+<p class="tab">
+When working with larger graphs it is very likely that several nodes get placed close together. Then, in order to better see what is going on, the user can zoom in to certain positions and can drag the current part of the picture around. The zooming can be done by placing the mouse over a certain position and turning the mousewheel, then the application will zoom into this position. By moving the mouse around while holding the left mouse button the currently displayed part of the graph can be shifted around. 
+</p>
+
+<p><br>
+</p>
+
+
+
+</body></html>
