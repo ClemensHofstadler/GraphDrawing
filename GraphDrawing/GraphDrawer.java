@@ -282,10 +282,20 @@ public abstract class GraphDrawer {
 	 * @param radius The radius of the node.
 	 */
 	private static void drawNode(Graphics g, Node n, int radius) {
-		g.fillOval(((int)(n.x())) - radius, ((int)(n.y())) - radius, 2 * radius, 2 * radius);
+		int x = ((int)n.x())-radius+1;
+		int y = ((int)n.y())-radius+1;
+		int w = 2*radius + 1;
+		int h = 2*radius + 1;
+		g.fillOval(x, y, w, h);
+
 		if(n.color() != Color.BLACK) {
+			int innerRadius = (int)(0.6*radius);
+			x = ((int)n.x())-innerRadius+1;
+			y = ((int)n.y())-innerRadius+1;
+			w = 2*innerRadius + 1;
+			h = 2*innerRadius + 1;
 			g.setColor(n.color());
-			g.fillOval((int)(n.x() - 0.6*radius), (int)(n.y() - 0.6*radius), (int)(1.2 * radius), (int)(1.2 * radius));
+			g.fillOval(x, y, w, h);
 			g.setColor(Color.BLACK);
 		}
 	}
