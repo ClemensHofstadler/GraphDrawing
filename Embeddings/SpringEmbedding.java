@@ -68,6 +68,7 @@ public class SpringEmbedding {
 		for (int i = 0; i < G.nodes().size(); i++) {
 			Node oldNode = G.nodes().get(i);
 			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), oldNode.position());
+			newNode.setColor(oldNode.color());
 			G.nodes().set(i, newNode);
 		}
 
@@ -95,6 +96,7 @@ public class SpringEmbedding {
 			double[] coord = { Math.random(), Math.random(), Math.random() };
 			Node oldNode = G.nodes().get(i);
 			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), coord);
+			newNode.setColor(oldNode.color());
 			G.nodes().set(i, newNode);
 		}
 		boolean converged = false;

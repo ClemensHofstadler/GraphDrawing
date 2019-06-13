@@ -74,6 +74,7 @@ public class SpectralEmbedding {
 			double z = (eig[2][i] - minMaxZ[0])/(minMaxZ[1] - minMaxZ[0]);
 			Node oldNode = G.nodes().get(i);
 			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), new double[] {x,y,z});
+			newNode.setColor(oldNode.color());
 			G.nodes().set(i, newNode);
 		}
 		
