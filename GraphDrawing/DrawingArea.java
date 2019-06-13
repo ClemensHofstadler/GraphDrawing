@@ -40,17 +40,23 @@ public class DrawingArea extends JPanel{
 	 * x-coordinate of the point which is fixed during the zoom
 	 * (coordinate is given scaled to the unit square)
 	 */
-	public double x;
+	private double x;
 	/**
 	 * y-coordinate of the point which is fixed during the zoom
 	 * (coordinate is given scaled to the unit square)
 	 */
-	public double y;
+	private double y;
 	
-	public double xMoveReference;
-	public double xMoveReferenceScaled;
-	public double yMoveReference;
-	public double yMoveReferenceScaled;
+	private double xMoveReference;
+	private double xMoveReferenceScaled;
+	private double yMoveReference;
+	private double yMoveReferenceScaled;
+	
+	/**
+	 * Determines whether the currently displayed
+	 * layout is 3D. This enables rotations.
+	 */
+	private boolean threeDLayout;
 //=======================================================================
 // Constructor
 //=======================================================================		
@@ -65,6 +71,7 @@ public class DrawingArea extends JPanel{
 		zoom = 1;
 		x = y = 0;
 		xMoveReference = yMoveReference = 0;
+		threeDLayout = false;
 	}
 //=======================================================================
 // Getters for some fields
@@ -74,7 +81,12 @@ public class DrawingArea extends JPanel{
 	 * @return The current size of the drawing area.
 	 */
 	public int sizeDrawing() {return size;}
-	
+	/**
+	 * Returns whether the currently displayed
+	 * layout is 3D.
+	 * @return The value of the field "threeDLayout".
+	 */
+	public boolean threeDLayout() {return threeDLayout;}
 //=======================================================================
 // Setters for some fields
 //=======================================================================	
@@ -99,6 +111,11 @@ public class DrawingArea extends JPanel{
 	 * @param b The new value of the field linearEdges.
 	 */
 	public void setLinearEdges(boolean b) {linearEdges = b;}
+	/**
+	 * Sets the boolean value of the field threeDLayout.
+	 * @param b The new value of the field threeDLayout.
+	 */
+	public void setThreeDLayout(boolean b) {threeDLayout = b;}
 //=======================================================================
 // Zooming related functions
 //=======================================================================		
@@ -178,6 +195,16 @@ public class DrawingArea extends JPanel{
 		paint(getGraphics());
 	}
 	
+//=======================================================================
+// Click & drag related functions
+//=======================================================================		
+	public void firstClick(double ptX, double ptY) {
+		xMoveReference = ptX;
+		yMoveReference = ptY;
+		xMoveReferenceScaled = x;
+		yMoveReferenceScaled = y;
+	}
+	
 	public void move(double xNew, double yNew) {
 		double dx = xMoveReference - xNew;
 		double dy = yMoveReference - yNew;
@@ -198,11 +225,10 @@ public class DrawingArea extends JPanel{
 	public void paint(Graphics g) {
 		if(G != null) {
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.clearRect(0, 0, size, size);
 			g2d.setBackground(Color.WHITE);
 			g2d.translate((-zoom*x+x)*size, (-zoom*y+y)*size);
 			super.paint(g2d);
-			GraphDrawer.drawGraph(g2d,G,(int)(size*zoom),linearEdges);
+			GraphDrawer.drawGraph(g2d,G,(int)(size*zoom),linearEdges,threeDLayout);
 		}
 	}
 	
