@@ -387,8 +387,17 @@ public class GUI {
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
 				drawingArea.setLinearEdges(true);
+				int index = 0;
+				if(markedNode != null)
+					index = G.nodes().indexOf(markedNode);
 				//print new layout
 				SpectralEmbedding.defineLayout(G,3);
+				if(markedNode != null) {
+					Node n = G.nodes().get(index);
+					GraphDrawer.markNode(n);
+					GraphDrawer.markAdjacentNodes(G, n);
+					markedNode = n;
+				}
 				drawingArea.setGraph(G);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
@@ -412,7 +421,18 @@ public class GUI {
 				drawingArea.setLinearEdges(true);
 				//print new layout
 				//AdaptiveSpringEmbedding.defineLayout(G, 0);
-				SpringEmbedding.defineLayout(G, 2, 0);
+				int index = 0;
+				if(markedNode != null)
+					index = G.nodes().indexOf(markedNode);
+				//print new layout
+				SpringEmbedding.defineLayout(G,2,0);
+				
+				if(markedNode != null) {
+					Node n = G.nodes().get(index);
+					GraphDrawer.markNode(n);
+					GraphDrawer.markAdjacentNodes(G, n);
+					markedNode = n;
+				}
 				drawingArea.setGraph(G);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
@@ -431,7 +451,18 @@ public class GUI {
 				gridLayoutButton.setVisible(false);
 				//print new layout
 				//SpringEmbedding3D.defineLayout(G);
-				SpringEmbedding.defineLayout(G, 3, 0);
+				int index = 0;
+				if(markedNode != null)
+					index = G.nodes().indexOf(markedNode);
+				//print new layout
+				SpringEmbedding.defineLayout(G,3,0);
+				
+				if(markedNode != null) {
+					Node n = G.nodes().get(index);
+					GraphDrawer.markNode(n);
+					GraphDrawer.markAdjacentNodes(G, n);
+					markedNode = n;
+				}
 				drawingArea.setGraph(G);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
