@@ -1,14 +1,37 @@
 package Embeddings;
+
 import Graph.Graph;
 import Graph.Node;
 
+/**
+ * Implements an graph drawing algorithm where each edge lies on the vertex of a
+ * regular grid.
+ * 
+ * @author Lukas Wögerer
+ * @version 1.0.1, 13rd June 2019
+ */
 public class GridEmbedding {
 
+	/**
+	 * Aligns the nodes of a Graph on a regular grid within the unit square. The
+	 * number of nodes per row (i.e. the number of vertices of the grid per row) is
+	 * chosen in such a way that the defined layout looks as quadratic as possible.
+	 * 
+	 * @param G A Graph
+	 */
 	public static void defineLayout(Graph G) {
 		int n = 1 + (int) Math.sqrt(G.nodes().size());
 		defineLayout(G, n);
 	};
 
+	/**
+	 * Aligns the nodes of a Graph on a regular grid within the unit square. The
+	 * number of nodes per row (i.e. the number of vertices of the grid per row) can
+	 * be chosen freely.
+	 * 
+	 * @param G           A Graph
+	 * @param nodesPerRow Defines the number of nodes per row.
+	 */
 	public static void defineLayout(Graph G, int nodesPerRow) {
 		int size = G.nodes().size();
 

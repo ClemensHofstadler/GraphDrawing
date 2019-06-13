@@ -14,12 +14,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+
 import javax.swing.border.BevelBorder;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.event.MouseMotionListener;
@@ -29,8 +31,11 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import java.awt.Color;
+
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 
 import java.awt.Component;
@@ -41,7 +46,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-import Embeddings.AdaptiveSpringEmbedding;
+import Embeddings.SpringEmbedding;
 import Embeddings.CircularEmbedding;
 import Embeddings.GridEmbedding;
 import Embeddings.LayeredEmbedding;
@@ -50,6 +55,7 @@ import Embeddings.RandomEmbedding;
 import Embeddings.SpectralEmbedding;
 import Graph.Graph;
 import Graph.Node;
+import Graph.Node3D;
 import GraphDrawing.DrawingArea;
 import GraphDrawing.GraphDrawer;
 /**
@@ -71,7 +77,7 @@ import GraphDrawing.GraphDrawer;
  * or zooming is also provided.
  * 
  * @author Clemens Hofstadler, Lukas Wögerer
- * @version 1.0.0, 31st May 2019
+ * @version 1.0.1, 13rd June 2019
  *
  */
 public class GUI {
@@ -81,6 +87,7 @@ public class GUI {
 	Graph G;
 	private JFrame frmGraphDrawing;
 	private Node markedNode;
+	private boolean allowRotation = false;
 	
 //===========================================================================================
 	/**
@@ -246,6 +253,7 @@ public class GUI {
 		JMenuItem mntmRandomEmbedding = new JMenuItem("Random embedding");
 		mntmRandomEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -261,6 +269,7 @@ public class GUI {
 		JMenuItem mntmCircularEmbedding = new JMenuItem("Circular embedding");
 		mntmCircularEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -277,6 +286,7 @@ public class GUI {
 		JMenuItem mntmGridEmbedding = new JMenuItem("Grid embedding");
 		mntmGridEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -293,6 +303,7 @@ public class GUI {
 		JMenuItem mntmLayeredEmbedding = new JMenuItem("Layered embedding");
 		mntmLayeredEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -309,6 +320,7 @@ public class GUI {
 		JMenuItem mntmLinearEmbedding = new JMenuItem("Linear embedding");
 		mntmLinearEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -326,6 +338,7 @@ public class GUI {
 		JMenuItem mntmSpectralEmbedding = new JMenuItem("Spectral embedding");
 		mntmSpectralEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
@@ -339,45 +352,64 @@ public class GUI {
 		});
 		mnLayout.add(mntmSpectralEmbedding);
 		
-		JMenuItem mntmSpringEmbedding = new JMenuItem("Spring embedding");
-		mntmSpringEmbedding.addActionListener(new ActionListener() {
+		JMenuItem mntmSpringEmbedding2D = new JMenuItem("Spring embedding 2D");
+		mntmSpringEmbedding2D.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
 				drawingArea.reset();
 				randomButton.setVisible(true);
 				gridLayoutButton.setVisible(true);
-				AdaptiveSpringEmbedding.defineLayout(G, 0);
+				//AdaptiveSpringEmbedding.defineLayout(G, 0);
+				SpringEmbedding.defineLayout(G, 2, 0);
 				drawingArea.setGraph(G);
 		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
-		mnLayout.add(mntmSpringEmbedding);
+		mnLayout.add(mntmSpringEmbedding2D);
+		
+		JMenuItem mntmSpringEmbedding3D = new JMenuItem("Spring embedding 3D");
+		mntmSpringEmbedding3D.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				allowRotation = true;
+				if(G==null)
+					return;
+				drawingArea.reset();
+				//SpringEmbedding3D.defineLayout(G);
+				SpringEmbedding.defineLayout(G, 3, 0);
+				drawingArea.setGraph(G);
+		        drawingArea.setLinearEdges(true);
+		        drawingArea.paint(drawingArea.getGraphics());
+			}
+		});
+		mnLayout.add(mntmSpringEmbedding3D);
 		
 		JMenuItem mntmSpringEmbeddingAnimation = new JMenuItem("Spring embedding (animated)");
 		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				allowRotation = false;
 				if(G==null)
 					return;
-				/*drawingArea.reset();
+				drawingArea.reset();
 				drawingArea.setLinearEdges(true);
 
 				GridEmbedding.defineLayout(G);// Random or Grid
 				drawingArea.setGraph(G);
 				drawingArea.paint(drawingArea.getGraphics());
 
-				AnimatedSpringEmbedding animation = new AnimatedSpringEmbedding(G);
+				//AnimatedSpringEmbedding animation = new AnimatedSpringEmbedding(G);
 				
-				Thread thread = new Thread() {
+				/*Thread thread = new Thread() {
 					@SuppressWarnings("deprecation")
 					@Override
 					public void run() {
 						int iter = 0;
-						while (!animation.converged && iter < AdaptiveSpringEmbedding.maximumIterations) {
+						while (!animation.converged && iter < AnimatedSpringEmbedding.maximumIterations) {
 							iter++;
 							try {
-								Thread.sleep(100);
+								Thread.sleep(150);
 							} catch (InterruptedException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -403,7 +435,6 @@ public class GUI {
 						this.stop();
 						
 					}
-				}
 				};
 				thread.start();*/
 			}
@@ -541,7 +572,7 @@ public class GUI {
 		gridLayoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				drawingArea.reset();
-				AdaptiveSpringEmbedding.defineLayout(G, 0);
+				SpringEmbedding.defineLayout(G, 2, 0);
 				drawingArea.setGraph(G);
 				drawingArea.setLinearEdges(true);
 				drawingArea.paint(drawingArea.getGraphics());
@@ -555,7 +586,7 @@ public class GUI {
 		randomButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				drawingArea.reset();
-				AdaptiveSpringEmbedding.defineLayout(G, 1);
+				SpringEmbedding.defineLayout(G, 2, 1);
 				drawingArea.setGraph(G);
 				drawingArea.setLinearEdges(true);
 				drawingArea.paint(drawingArea.getGraphics());
@@ -581,7 +612,30 @@ public class GUI {
 				if (val == JFileChooser.APPROVE_OPTION)
 					drawingArea.save(fileChooser.getSelectedFile());
 			}
-		});	
+		});
+//===========================================================================================
+//Rotate 3D image
+//===========================================================================================
+		class KeyboardAction extends AbstractAction {
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent tf) {
+				if(allowRotation)
+				{
+					System.out.println(tf.getActionCommand());
+					Node3D.rotate(tf.getActionCommand(), G);
+					//drawingArea.reset();
+					//drawingArea.setGraph(G);
+					//drawingArea.setLinearEdges(true);
+					drawingArea.paint(drawingArea.getGraphics());
+				}
+			}
+		}
+		settingsArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put( KeyStroke.getKeyStroke("W"), "doKeyboardAction");
+		settingsArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put( KeyStroke.getKeyStroke("A"), "doKeyboardAction");
+		settingsArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put( KeyStroke.getKeyStroke("S"), "doKeyboardAction");
+		settingsArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put( KeyStroke.getKeyStroke("D"), "doKeyboardAction");
+		settingsArea.getActionMap().put( "doKeyboardAction", new KeyboardAction() );
 //===========================================================================================
 //Functionality to click on nodes
 //===========================================================================================

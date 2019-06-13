@@ -88,6 +88,15 @@ public abstract class GraphDrawer {
 		//draw nodes - important to do this AFTER drawing the edges!!
 		for(Node n: nodes)
 			drawNode(g, n, radius);
+		/*for(Node n: nodes) {
+		 * idea for drawing nodes in different sizes, depending on positions in 3D space.
+			int rad = (int) Math.sqrt((3.5*size)/G.nodes().size());
+			double imp = n.importance();
+			imp *= 0.7;
+			imp += 0.3;
+			rad*=imp;
+			drawNode(g, n, rad);
+		}*/
 		
 		//set nodes back
 		for(int i = 0; i < nodes.size(); i++) {
@@ -287,7 +296,7 @@ public abstract class GraphDrawer {
 		int w = 2*radius + 1;
 		int h = 2*radius + 1;
 		g.fillOval(x, y, w, h);
-
+		
 		if(n.color() != Color.BLACK) {
 			int innerRadius = (int)(0.6*radius);
 			x = ((int)n.x())-innerRadius+1;
