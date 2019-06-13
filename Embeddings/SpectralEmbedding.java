@@ -26,10 +26,11 @@ public class SpectralEmbedding {
 	public static void defineLayout(Graph G, int dim) {
 		//if less than 4 nodes, we have not enough eigenvectors
 		//use springEmbedding instead
-		if(G.nodes().size() < 4)
+		if(G.nodes().size() < 4) {
 			SpringEmbedding.defineLayout(G, dim, 0);
+			return;
+		}
 		
-		System.out.println(dim);
 		if(dim == 2)
 			defineLayout2D(G);
 		if(dim == 3)
