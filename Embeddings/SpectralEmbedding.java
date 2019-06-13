@@ -1,14 +1,16 @@
 package Embeddings;
 
 import Graph.Graph;
+import Graph.Node;
+import Graph.Node3D;
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 /**
  * Class to align a graph according to a spectral embedding. This means
  * that the nodes of the graph are aligned according to the 2 eigenvectors
- * corresponding to the largest eigenvalues of the Lagrangian matrix of 
- * the graph.
+ * corresponding to the smallest non-zero eigenvalues of the Lagrangian matrix 
+ * of the graph.
  * 
  * @author Clemens Hofstadler
  * @version 1.0.0, 31st May 2019
@@ -21,32 +23,62 @@ public class SpectralEmbedding {
 	 * 
 	 * @param G A graph.
 	 */
-	public static void defineLayout(Graph G) {
+	public static void defineLayout(Graph G, int dim) {
+		//if less than 4 nodes, we have not enough eigenvectors
+		//use springEmbedding instead
+		if(G.nodes().size() < 4)
+			SpringEmbedding.defineLayout(G, dim, 0);
 		
-		//Determine eigenvectors for the 2 largest eigenvalues
-		//of the Lagrangian
+		System.out.println(dim);
+		if(dim == 2)
+			defineLayout2D(G);
+		if(dim == 3)
+			defineLayout3D(G);
+	}
+	
+	private static void defineLayout2D(Graph G) {
+		//Compute the Lagrangian matrix of G 
+		//and its eigenvectors
 		Matrix L = degreeMatrix(G).minus(adjacencyMatrix(G));		
-		double[][] eig = getMaxEigenvectors(L);
+		double[][] eig = getMinEigenvectors(L,2);
 		
 		//Determine min and max values appearing in the eigenvectors
-		double minX = eig[0][0];
-		double minY = eig[1][0];
-		double maxX = eig[0][0];
-		double maxY = eig[1][0];
-		for(int i = 0; i < eig[0].length; i++) {
-			if(eig[0][i] < minX) minX = eig[0][i];
-			if(eig[0][i] > maxX) maxX = eig[0][i];
-			if(eig[1][i] < minY) minY = eig[1][i];
-			if(eig[1][i] > maxY) maxY = eig[1][i];
-		}
+		double[] minMaxX = minMax(eig[0]);
+		double[] minMaxY = minMax(eig[1]);
 		
 		//place the nodes according to the eigenvectors 
 		//but with values scaled to [0,1]
 		for(int i = 0; i < G.nodes().size(); i++) {
-			double x = (eig[0][i] - minX)/(maxX - minX);
-			double y = (eig[1][i] - minY)/(maxY - minY);
+			double x = (eig[0][i] - minMaxX[0])/(minMaxX[1] - minMaxX[0]);
+			double y = (eig[1][i] - minMaxY[0])/(minMaxY[1] - minMaxY[0]);
 			G.nodes().get(i).setPosition(x, y);
 		}
+	}
+	
+	private static void defineLayout3D(Graph G) {
+		//Compute the Lagrangian matrix of G
+		//and its eigenvectors
+		Matrix L = degreeMatrix(G).minus(adjacencyMatrix(G));	
+		double[][] eig = getMinEigenvectors(L,3);
+		
+		//Determine min and max values appearing in the eigenvectors
+		double[] minMaxX = minMax(eig[0]);
+		double[] minMaxY = minMax(eig[1]);
+		double[] minMaxZ = minMax(eig[2]);
+				
+		//place the nodes according to the eigenvectors 
+		//but with values scaled to [0,1]
+		for(int i = 0; i < G.nodes().size(); i++) {
+			double x = (eig[0][i] - minMaxX[0])/(minMaxX[1] - minMaxX[0]);
+			double y = (eig[1][i] - minMaxY[0])/(minMaxY[1] - minMaxY[0]);
+			double z = (eig[2][i] - minMaxZ[0])/(minMaxZ[1] - minMaxZ[0]);
+			Node oldNode = G.nodes().get(i);
+			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), new double[] {x,y,z});
+			G.nodes().set(i, newNode);
+		}
+		
+		//project nodes down
+		Node3D.project3DPoints(G);
 	}
 	
 	/**
@@ -89,44 +121,34 @@ public class SpectralEmbedding {
 	}
 	
 	/**
-	 * Computes the eigenvectors for the 2 largest eigenvalues
-	 * of a matrix M.
+	 * Computes the eigenvectors for the 2nd and 3rd
+	 * smallest eigenvalues of a symmetric matrix M.
 	 * 
-	 * @param M A matrix.
-	 * @return The eigenvectors for the 2 largest eigenvalues 
+	 * @param M A symmetric matrix.
+	 * @return The eigenvectors for the 2nd and 3rd
+	 * smallest eigenvalues 
 	 * of M.
 	 */
-	private static double[][] getMaxEigenvectors(Matrix M){
-
-		//compute the eigenvalues of M
+	private static double[][] getMinEigenvectors(Matrix M,int dim) {
+		//compute the eigensystem of M
 		EigenvalueDecomposition eig = M.eig();
-		
-		//compute absolute value of the eigenvalues
-		double [] realEig = eig.getRealEigenvalues();
-		double [] imEig = eig.getImagEigenvalues();
-		double [] abs = new double[imEig.length];
-		for(int i = 0; i < abs.length; i++) {
-			abs[i] = realEig[i]*realEig[i] + imEig[i]*imEig[i];
-		}
-		
-		//get position of largest eigenvalue
-		int max = 0;
-		for(int i = 0; i < abs.length; i++)
-			if(abs[i] > abs[max])
-				max = i;
-		
-		//get position of second largest eigenvalue
-		int max2 = (max==0? 1 : 0);
-		for(int i = 0; i < abs.length; i++)
-			if(abs[i] > abs[max2] && i != max)
-				max2 = i;
-		
-		//get the corresponding eigenvectors
-		double[][] eigVectors = new double[2][M.getColumnDimension()];
+
+		//eigenvectors are sorted in ascending order
+		//ignore eigenvector corresponding to eigenvalue 0
+		double[][] eigVectors = new double[dim][M.getColumnDimension()];
 		Matrix eigV = eig.getV().transpose();
-		eigVectors[0] = eigV.getArray()[max];
-		eigVectors[1] = eigV.getArray()[max2];
-		
+		for(int i = 0; i < dim; i++)
+			eigVectors[i] = eigV.getArray()[i+1];
 		return eigVectors;
+	}
+	
+	private static double[] minMax(double[] a) {
+		double min = a[0];
+		double max = a[0];
+		for(int i = 0; i < a.length; i++) {
+			if(a[i] < min) min = a[i];
+			if(a[i] > max) max = a[i];
+		}
+		return(new double[] {min,max});
 	}
 }

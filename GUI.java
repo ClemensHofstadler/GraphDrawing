@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
@@ -84,10 +85,18 @@ public class GUI {
 //===========================================================================================
 //Fields
 //===========================================================================================
+	/**
+	 * The currently loaded graph.
+	 */
 	Graph G;
+	/**
+	 * The area on which the graph will be drawn.
+	 */
 	private JFrame frmGraphDrawing;
+	/**
+	 * The node the user has last clicked on.
+	 */
 	private Node markedNode;
-	private boolean allowRotation = false;
 	
 //===========================================================================================
 	/**
@@ -179,10 +188,8 @@ public class GUI {
 			@Override
 		    public void mousePressed(MouseEvent e) {
 				Point pt = e.getPoint();
-		        drawingArea.xMoveReference = (pt.getX()/ (double) drawingArea.sizeDrawing());
-		        drawingArea.yMoveReference = (pt.getY()/ (double) drawingArea.sizeDrawing());
-		        drawingArea.xMoveReferenceScaled = drawingArea.x;
-		        drawingArea.yMoveReferenceScaled = drawingArea.y;
+				double size = (double)drawingArea.sizeDrawing();
+				drawingArea.firstClick(pt.getX()/size, pt.getY()/size);
 		    } 
 		});
 
@@ -227,17 +234,22 @@ public class GUI {
 				        	line = in.readLine();	
 				        }
 				        
+				        //adapt all stats
 						drawingArea.reset();
-				        GridEmbedding.defineLayout(G);
-				        drawingArea.setGraph(G);
-				        drawingArea.setLinearEdges(true);
-				        displayGraphInfo(infoField);
-				        G.setDirected(rdbtnDirected.isSelected());
-				        drawingArea.paint(drawingArea.getGraphics());
-				        randomButton.setVisible(false);
+						drawingArea.setLinearEdges(true);
+						randomButton.setVisible(false);
 						gridLayoutButton.setVisible(false);
 						markedNode = null;
+						drawingArea.setThreeDLayout(false);
+						G.setDirected(rdbtnDirected.isSelected());
+						
+						//set new graph
+				        GridEmbedding.defineLayout(G);
+				        drawingArea.setGraph(G);
 				        
+				        //print everything needed
+				        displayGraphInfo(infoField);
+				        drawingArea.paint(drawingArea.getGraphics());
 				            
 				    } catch (Exception ex) {
 				    	ex.printStackTrace();
@@ -253,15 +265,18 @@ public class GUI {
 		JMenuItem mntmRandomEmbedding = new JMenuItem("Random embedding");
 		mntmRandomEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				
+				//adapt all stats
 				drawingArea.reset();
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
+				drawingArea.setThreeDLayout(false);
+				drawingArea.setLinearEdges(true);
+				//print new layout
 				RandomEmbedding.defineLayout(G);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
@@ -269,15 +284,17 @@ public class GUI {
 		JMenuItem mntmCircularEmbedding = new JMenuItem("Circular embedding");
 		mntmCircularEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
+		        drawingArea.setLinearEdges(true);
+		        //print new layout
 				CircularEmbedding.defineLayout(G);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
@@ -286,15 +303,17 @@ public class GUI {
 		JMenuItem mntmGridEmbedding = new JMenuItem("Grid embedding");
 		mntmGridEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
+				drawingArea.setLinearEdges(true);
+				//print new layout
 				GridEmbedding.defineLayout(G);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
@@ -303,15 +322,17 @@ public class GUI {
 		JMenuItem mntmLayeredEmbedding = new JMenuItem("Layered embedding");
 		mntmLayeredEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
+				drawingArea.setLinearEdges(true);
+				//print new layout
 				LayeredEmbedding.defineLayout(G);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
@@ -320,81 +341,117 @@ public class GUI {
 		JMenuItem mntmLinearEmbedding = new JMenuItem("Linear embedding");
 		mntmLinearEmbedding.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
+				drawingArea.setLinearEdges(false);
+				 //print new layout
 				LinearEmbedding.defineLayout(G);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(false);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
 		mnLayout.add(mntmLinearEmbedding);
 		mnLayout.add(mntmRandomEmbedding);
 		
-		JMenuItem mntmSpectralEmbedding = new JMenuItem("Spectral embedding");
-		mntmSpectralEmbedding.addActionListener(new ActionListener() {
+		JMenuItem mntmSpectralEmbedding2D = new JMenuItem("2D layout");
+		mntmSpectralEmbedding2D.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(false);
 				gridLayoutButton.setVisible(false);
-				SpectralEmbedding.defineLayout(G);
-				drawingArea.setGraph(G);
 		        drawingArea.setLinearEdges(true);
+		        //print new layout
+				SpectralEmbedding.defineLayout(G,2);
+				drawingArea.setGraph(G);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
-		mnLayout.add(mntmSpectralEmbedding);
 		
-		JMenuItem mntmSpringEmbedding2D = new JMenuItem("Spring embedding 2D");
-		mntmSpringEmbedding2D.addActionListener(new ActionListener() {
+		JMenuItem mntmSpectralEmbedding3D = new JMenuItem("3D layout");
+		mntmSpectralEmbedding3D.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(true);
+				randomButton.setVisible(false);
+				gridLayoutButton.setVisible(false);
+				drawingArea.setLinearEdges(true);
+				//print new layout
+				SpectralEmbedding.defineLayout(G,3);
+				drawingArea.setGraph(G);
+		        drawingArea.paint(drawingArea.getGraphics());
+			}
+		});
+		
+		JMenu spectralLayoutMenu = new JMenu("Spectral embedding");
+		spectralLayoutMenu.add(mntmSpectralEmbedding2D);
+		spectralLayoutMenu.add(mntmSpectralEmbedding3D);
+		mnLayout.add(spectralLayoutMenu);
+		
+		JMenuItem mntmSpringEmbedding2D = new JMenuItem("2D layout");
+		mntmSpringEmbedding2D.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(G==null)
+					return;
+				//adapt all stats
+				drawingArea.reset();
+				drawingArea.setThreeDLayout(false);
 				randomButton.setVisible(true);
 				gridLayoutButton.setVisible(true);
+				drawingArea.setLinearEdges(true);
+				//print new layout
 				//AdaptiveSpringEmbedding.defineLayout(G, 0);
 				SpringEmbedding.defineLayout(G, 2, 0);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
-		mnLayout.add(mntmSpringEmbedding2D);
 		
-		JMenuItem mntmSpringEmbedding3D = new JMenuItem("Spring embedding 3D");
+		JMenuItem mntmSpringEmbedding3D = new JMenuItem("3D layout");
 		mntmSpringEmbedding3D.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = true;
 				if(G==null)
 					return;
+				//adapt all stats
 				drawingArea.reset();
+				drawingArea.setThreeDLayout(true);
+				drawingArea.setLinearEdges(true);
+				randomButton.setVisible(false);
+				gridLayoutButton.setVisible(false);
+				//print new layout
 				//SpringEmbedding3D.defineLayout(G);
 				SpringEmbedding.defineLayout(G, 3, 0);
 				drawingArea.setGraph(G);
-		        drawingArea.setLinearEdges(true);
 		        drawingArea.paint(drawingArea.getGraphics());
 			}
 		});
-		mnLayout.add(mntmSpringEmbedding3D);
+		
+		JMenu springEmbeddingMenu = new JMenu("Spring embedding");
+		springEmbeddingMenu.add(mntmSpringEmbedding2D);
+		springEmbeddingMenu.add(mntmSpringEmbedding3D);
+		mnLayout.add(springEmbeddingMenu);
 		
 		JMenuItem mntmSpringEmbeddingAnimation = new JMenuItem("Spring embedding (animated)");
 		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				allowRotation = false;
 				if(G==null)
 					return;
+				//set new stats
 				drawingArea.reset();
 				drawingArea.setLinearEdges(true);
-
+				drawingArea.setThreeDLayout(false);
+				//print new layout
 				GridEmbedding.defineLayout(G);// Random or Grid
 				drawingArea.setGraph(G);
 				drawingArea.paint(drawingArea.getGraphics());
@@ -620,7 +677,7 @@ public class GUI {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent tf) {
-				if(allowRotation)
+				if(drawingArea.threeDLayout())
 				{
 					System.out.println(tf.getActionCommand());
 					Node3D.rotate(tf.getActionCommand(), G);

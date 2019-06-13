@@ -64,7 +64,7 @@ Using the random embedding, the nodes of the graph will be placed randomly and t
 </p> 
 
 <h3 class="tab">Spectral embedding</h3>
-<p class="tab">The spectral embedding uses the eigenvectors of the Laplace matrix of the graph as Cartesian coordinates of the graph's nodes. The idea of the layout is to compute the two largest eigenvalues and corresponding eigenvectors of the laplacian matrix of the graph and then the x-coordinate of the i-th node is the value of the i-th coordinate of the first eigenvector. Correspondingly the i-th component of the second eigenvector describes the y-coordinate of the node i. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+<p class="tab">The spectral embedding uses the eigenvectors of the Laplacian matrix of the graph as Cartesian coordinates of the graph's nodes. The idea of the layout is to compute the two smallest non-zero eigenvalues (the smallest eigenvalue of the Laplacian matrix is always 0 and holds no interesting information) and corresponding eigenvectors of the Laplacian matrix of the graph and then the x-coordinate of the i-th node is the value of the i-th coordinate of the first eigenvector. Correspondingly the i-th component of the second eigenvector describes the y-coordinate of the node i. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
 </p>
 
 

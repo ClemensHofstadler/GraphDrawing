@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import Graph.Node;
 import Graph.Graph;
+import Graph.Node3D;
 
 import java.awt.RenderingHints;
 /**
@@ -22,10 +23,28 @@ import java.awt.RenderingHints;
 public abstract class GraphDrawer {
 	/**
 	 * Color of a node when the user clicks on it.
+	 * Currently: orange.
 	 */
-	private static final Color MARKED_NODE_COLOR = Color.orange;
+	private static final Color MARKED_NODE_COLOR = Color.ORANGE;
+	/**
+	 * Color of adjancent nodes of a clicked node 'n' in 
+	 * directed graphs which have an edge coming from 'n'.
+	 * Currently: red.
+	 */
 	private static final Color ARROW_TO = Color.RED;
+	/**
+	 * Color of adjancent nodes of a clicked node 'n' in 
+	 * directed graphs which have an edge going to 'n'.
+	 * Currently: red.
+	 */
 	private static final Color ARROW_FROM = Color.BLUE;
+	/**
+	 * Color of adjancent nodes of a clicked node 'n' in 
+	 * undirected graphs and of nodes which have an edge 
+	 * coming from  'n' and an edge going to 'n' in a
+	 * directed graph, respectively.
+	 * Currently: magenta.
+	 */
 	private static final Color ARROW_TWO_WAY = Color.MAGENTA;
 //======================================================================================
 //Draw graph
@@ -33,76 +52,106 @@ public abstract class GraphDrawer {
 	/**
 	 * Draws a graph G on a graphics area of a certain size. Depending on the value of 
 	 * linearEdges the edges between the nodes are drawn as straight lines or as 
-	 * semicircles.
+	 * semicircles. The boolean value threeDim, additionally defines whether the
+	 * graph will be drawn in a 3 dimensional perspective.
 	 * 
 	 * @param g The drawing area on which the graph is drawn.
-	 * @param G The graph to be drawn.
+	 * @param G The graph to be drawn; non-zero
 	 * @param size The size of the drawing area.
 	 * @param linearEdges Boolean value determining whether edges between the nodes are drawn as 
 	 * straight lines or as semicircles.
+	 * @param threeDim Boolean value determining whether the graph will be drawn
+	 * three dimensionally.
 	 */
-	public static void drawGraph(Graphics g, Graph G, int size, boolean linearEdges) {
-		
-		if(linearEdges)
-			linearEdges(g,size,G);
-		else
-			circularEdges(g,size,G);
-	}	
-//======================================================================================
-//Draw graph with linear edges
-//======================================================================================
-	/**
-	 * Draws a graph G on a graphics area of a certain size, where the edges of the graph
-	 * are drawn as straight edges.
-	 * 
-	 * @param g The drawing area on which the graph is drawn.
-	 * @param size The size of the drawing area.
-	 * @param G The graph to be drawn.
-	 */
-	public static void linearEdges(Graphics g, int size, Graph G) {
+	public static void drawGraph(Graphics g, Graph G, int size, boolean linearEdges, boolean threeDim) {
 		
 		//clear the drawing area
 		g.clearRect(0,0,size,size);
 		
-		ArrayList<Node> nodes = G.nodes();
-		double[][] oldPositions = new double [nodes.size()][2];
-		ArrayList<int[]> edges = G.edges();
-		int radius = getRadius(size, G);
+		//scale nodes up
+		double[][] oldPositions = scaleUp(G,size);
+				
+		//draw the graph
+		if(threeDim)
+			draw3DLayout(g,G,size,linearEdges);
+		else
+			draw2DLayout(g,G,size,linearEdges);
 		
-		//scaling the unit square accordingly
-		for(int i = 0; i < nodes.size(); i++) {
-			//set node to new position
-			double oldX = nodes.get(i).x();
-			double oldY = nodes.get(i).y();
-			oldPositions[i][0] = oldX;
-			oldPositions[i][1] = oldY;
-			double newX = 0.8*size*oldX + 0.1*size;
-			double newY = 0.8*size*oldY + 0.1*size;
-			nodes.get(i).setPosition(newX, newY);
+		//scale nodes back down
+		for(int i = 0; i < G.nodes().size(); i++) {
+			G.nodes().get(i).setPosition(oldPositions[i][0], oldPositions[i][1]);
 		}
+	}	
+//======================================================================================
+//2D layout
+//======================================================================================
+	/**
+	 * Draws a graph G on a graphics area of a certain size in a 2D perspective. 
+	 * Depending on the value of linearEdges the edges between the nodes are drawn 
+	 * as straight lines or as semicircles.
+	 * 
+	 * @param g The drawing area on which the graph is drawn.
+	 * @param G The graph to be drawn; non-zero
+	 * @param size The size of the drawing area.
+	 * @param linearEdges Boolean value determining whether edges between the nodes are drawn as 
+	 * straight lines or as semicircles.
+	 */
+	private static void draw2DLayout(Graphics g, Graph G, int size, boolean linearEdges) {
+		ArrayList<Node> nodes = G.nodes();
+		ArrayList<int[]> edges = G.edges();
+		int radius = getRadius(size,G);
 		
 		//draw edges
 		for(int[] edge: edges)
-			drawLinearEdge(g,G,edge,radius);
-		
+			if(linearEdges)
+				drawLinearEdge(g,G,edge,radius);
+			else
+				drawCircularEdge(g,G,edge,radius);
+				
 		//draw nodes - important to do this AFTER drawing the edges!!
 		for(Node n: nodes)
 			drawNode(g, n, radius);
-		/*for(Node n: nodes) {
-		 * idea for drawing nodes in different sizes, depending on positions in 3D space.
-			int rad = (int) Math.sqrt((3.5*size)/G.nodes().size());
-			double imp = n.importance();
-			imp *= 0.7;
-			imp += 0.3;
-			rad*=imp;
-			drawNode(g, n, rad);
-		}*/
+	}
+	
+//======================================================================================
+//3D layout
+//======================================================================================	
+	/**
+	 * Draws a graph G on a graphics area of a certain size in a 3D perspective. 
+	 * Depending on the value of linearEdges the edges between the nodes are drawn 
+	 * as straight lines or as semicircles.
+	 * 
+	 * @param g The drawing area on which the graph is drawn.
+	 * @param G The graph to be drawn; non-zero
+	 * @param size The size of the drawing area.
+	 * @param linearEdges Boolean value determining whether edges between the nodes are drawn as 
+	 * straight lines or as semicircles.
+	 */
+	private static void draw3DLayout(Graphics g, Graph G, int size, boolean linearEdges) {
+		ArrayList<Node> nodes = G.nodes();
+		ArrayList<int[]> edges = G.edges();
+		int radius = getRadius(size,G);
 		
-		//set nodes back
-		for(int i = 0; i < nodes.size(); i++) {
-			nodes.get(i).setPosition(oldPositions[i][0], oldPositions[i][1]);
+		//draw edges
+		for(int[] edge: edges) {
+			double dist = ((Node3D) nodes.get(edge[1])).distance;
+			double factor = 0.2+0.8*dist;
+			if(linearEdges)
+				drawLinearEdge(g,G,edge,(int)(factor*radius));
+			else
+				drawCircularEdge(g,G,edge,(int)(factor*radius));
+		}
+		
+		//draw nodes - important to do this AFTER drawing the edges!!
+		for(Node n: nodes) {
+			double dist = ((Node3D) n).distance;
+			double factor = 0.2+0.8*dist;
+			drawNode(g, n, (int)(factor*radius));
 		}
 	}
+	
+//======================================================================================
+//Different edge drawing styles
 //======================================================================================
 	/**
 	 * Draws an edge of the graph G on the graphics area g. The edge is drawn as 
@@ -117,8 +166,8 @@ public abstract class GraphDrawer {
 	 */
 	private static void drawLinearEdge(Graphics g, Graph G, int[] edge, int radius) {
 		ArrayList<Node> nodes = G.nodes();
-		Graphics2D g1 = (Graphics2D) g.create();
-		g1.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
+		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
 		int arrowSize = getArrowSize(radius);
 			
 		double x1 = nodes.get(edge[0]).x();
@@ -131,60 +180,12 @@ public abstract class GraphDrawer {
 	    int len = (int) Math.sqrt(dx*dx + dy*dy)-radius;
 	    AffineTransform at = AffineTransform.getTranslateInstance(x1, y1);
 	    at.concatenate(AffineTransform.getRotateInstance(angle));
-	    g1.transform(at);
+	    g2d.transform(at);
 
-	    g1.drawLine(0, 0, len, 0);
+	    g2d.drawLine(0, 0, len, 0);
 	    if(G.directed())
-	    	g1.fillPolygon(new int[] {len, len-arrowSize, len-arrowSize, len},
+	    	g2d.fillPolygon(new int[] {len, len-arrowSize, len-arrowSize, len},
 	                      new int[] {0, -arrowSize, arrowSize, 0}, 4);
-	}
-//======================================================================================
-//Draw graph with circular edges
-//======================================================================================
-	/**
-	 * Draws a graph G on a graphics area of a certain size, where the edges of the graph
-	 * are drawn as semicircles.
-	 * 
-	 * @param g The drawing area on which the graph is drawn.
-	 * @param size The size of the drawing area.
-	 * @param G The graph to be drawn.
-	 */
-	public static void circularEdges(Graphics g, int size, Graph G) {
-		g.clearRect(0,0,size,size);
-		
-		ArrayList<Node> nodes = G.nodes();
-		double[][] oldPositions = new double [nodes.size()][2];
-		ArrayList<int[]> edges = G.edges();
-		int radius = getRadius(size, G);
-		
-		//scaling the unit square accordingly
-		for(int i = 0; i < nodes.size(); i++) {
-			//set node to new position
-			double oldX = nodes.get(i).x();
-			double oldY = nodes.get(i).y();
-			oldPositions[i][0] = oldX;
-			oldPositions[i][1] = oldY;
-			double newX = 0.8*size*oldX + 0.1*size;
-			double newY = 0.8*size*oldY + 0.1*size;
-			nodes.get(i).setPosition(newX, newY);
-		}
-		
-		//draw edges
-		for(int[] edge: edges)
-			if(Math.abs(edge[0]-edge[1]) < 2)
-				drawLinearEdge(g,G,edge,radius);
-			else
-				drawCircularEdge(g,G,edge,radius);
-		
-		//draw nodes - important to do this AFTER drawing the edges!!
-		for(Node n: nodes)
-			drawNode(g, n, radius);
-		
-		//set nodes back
-		for(int i = 0; i < nodes.size(); i++) {
-			nodes.get(i).setPosition(oldPositions[i][0], oldPositions[i][1]);
-		}
-			
 	}
 //======================================================================================
 	/**
@@ -199,6 +200,11 @@ public abstract class GraphDrawer {
 	 * @param radius The radius of the nodes.
 	 */
 	private static void drawCircularEdge(Graphics g, Graph G, int[] edge,int radius) {
+		if(Math.abs(edge[0]-edge[1]) < 2) {
+			drawLinearEdge(g,G,edge,radius);
+			return;
+		}
+		
 		ArrayList<Node> nodes = G.nodes();
 		Graphics2D g2d = (Graphics2D) g.create();
 		g2d.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
@@ -230,14 +236,38 @@ public abstract class GraphDrawer {
 //======================================================================================
 // For coloring specific nodes (or uncoloring them)
 //======================================================================================
+	/**
+	 * Colors a certain node in the color specified by the constant
+	 * MARKED_NODE_COLOR.
+	 * 
+	 * @param n The node to be colored.
+	 */
 	public static void markNode(Node n) {
 		n.setColor(MARKED_NODE_COLOR);
 	}
 	
+	/**
+	 * Colors a certain node black.
+	 * 
+	 * @param n The node to be colored.
+	 */
 	public static void unmarkNode(Node n) {
 		n.setColor(Color.BLACK);
 	}
 	
+	/**
+	 * Colors adjacent nodes of a certain node 'n' in specific colors.
+	 * In case of an undirected graph, all adjacent nodes are colored
+	 * in the color defined by the constant ARROW_TWO_WAY. In case of
+	 * a directed graph, nodes which have an edge coming from 'n' are
+	 * colored in the color defined by ARROW_TO, nodes which have an 
+	 * edge going to 'n' are colored in the color defined by ARROW_FROM 
+	 * and nodes which have both, an edge going to 'n' and an edge coming
+	 * from 'n', are colored in the color defined by the constant ARROW_TWO_WAY.
+	 * 
+	 * @param G The graph containing 'n'.
+	 * @param n A node of 'G'.
+	 */
 	public static void markAdjacentNodes(Graph G, Node n) {	
 		ArrayList<Integer> outEdges = G.outEdges(n);
 		ArrayList<Integer> inEdges = G.inEdges(n);
@@ -261,6 +291,12 @@ public abstract class GraphDrawer {
 		}
 	}
 	
+	/**
+	 * Colors all adjacent nodes of a certain node 'n' black.
+	 * 
+	 * @param G The graph containing 'n'.
+	 * @param n A node of 'G'.
+	 */
 	public static void unmarkAdjacentNodes(Graph G, Node n) {
 		
 		int i = G.nodes().indexOf(n);
@@ -310,6 +346,34 @@ public abstract class GraphDrawer {
 	}
 //======================================================================================
 	/**
+	 * Scales the positions of all nodes from the unit square up to 
+	 * a square of size "size".
+	 * 
+	 * @param G The graph to be scaled up.
+	 * @param size The size of the new bounding square
+	 * of the graph
+	 * 
+	 * @return A list of all old node positions of the graph. 
+	 * To later be able to scale the graph back.
+	 */
+	private static double[][] scaleUp(Graph G, int size){
+		ArrayList<Node> nodes = G.nodes();
+		double[][] oldPositions = new double [nodes.size()][2];
+		//scaling the unit square accordingly
+		for(int i = 0; i < nodes.size(); i++) {
+			//set node to new position
+			double oldX = nodes.get(i).x();
+			double oldY = nodes.get(i).y();
+			oldPositions[i][0] = oldX;
+			oldPositions[i][1] = oldY;
+			double newX = 0.8*size*oldX + 0.1*size;
+			double newY = 0.8*size*oldY + 0.1*size;
+			nodes.get(i).setPosition(newX, newY);
+		}
+		return(oldPositions);
+	}
+//======================================================================================
+	/**
 	 * Determines the radius of nodes of a graph G in relation to the size of the 
 	 * graphics area g.
 	 * @param size The size of the graphics area on which the graph should be drawn. 
@@ -331,14 +395,36 @@ public abstract class GraphDrawer {
 		return (int)(0.8*radius);
 	}
 //======================================================================================
+	/**
+	 * Returns the node of a graph which is closest to a certain position (x,y).
+	 * 
+	 * @param G A graph.
+	 * @param x x-coordinate of the position. The value of x can not exceed the
+	 * value of size
+	 * @param y y-coordinate of the position. The value of y can not exceed the
+	 * value of size
+	 * @param size Maximal value of the x and y coordinate.
+	 * @return The node of G which is closest to (x,y).
+	 */
 	public static Node nearestNode(Graph G, double x, double y, double size) {
 		return G.nearestNode((x/size-0.1)/0.8, (y/size-0.1)/0.8);
 	}
 //======================================================================================	
+	/**
+	 * Computes the distance of a node to a certain point (x,y) where the node
+	 * as well as the point (x,y) are located in a square with length size.
+	 * 
+	 * @param n The node to be considered.
+	 * @param x x-coordinate of the position. The value of x can not exceed the
+	 * value of size
+	 * @param y y-coordinate of the position. The value of y can not exceed the
+	 * value of size
+	 * @param size Maximal value of the x and y coordinate.
+	 * @return The euclidean distance from 'n' to the point (x,y).
+	 */
 	public static double distanceToNode(Node n, double x, double y, double size) {
 		double nodeNewX = 0.8 * size * n.x() + 0.1 * size;
 		double nodeNewY = 0.8 * size * n.y() + 0.1 * size;
 		return Math.sqrt(Math.pow(nodeNewX-x, 2)+Math.pow(nodeNewY-y, 2));
 	}
-
 }

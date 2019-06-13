@@ -7,9 +7,10 @@ import Graph.Graph;
 import Graph.Node;
 
 /**
- * Class to align an acyclic(!) graph according to a layered embedding. This means
- * that all nodes are placed on a horizontal layers such that all edges of the graph
- * show downwards.
+ * Class to align a graph according to a layered embedding. This means
+ * that all nodes are placed on a horizontal layers such that (almost) all 
+ * edges of the graph show downwards. In case of acyclic graphs, really
+ * all edges show downwards.
  * 
  * @author Clemens Hofstadler
  * @version 1.0.0, 11th June 2019
@@ -18,17 +19,27 @@ import Graph.Node;
 public class LayeredEmbedding {
 	
 	/**
-	 * Aligns the nodes of an acyclic graph G on horizontal layers
-	 * in the unit square such that all edges of G show downwards.
+	 * Aligns the nodes of a graph G on horizontal layers
+	 * in the unit square such that (almost) all edges of G show 
+	 * downwards.
 	 * 
-	 * @param G An acyclic graph.
+	 * @param G A graph.
 	 */
 	public static void defineLayout(Graph G) {
-		if(!isAcyclic(G))
-			return;
-	
-		ArrayList<ArrayList<Node>> layers = assignLayers(G);
+		//make copies
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		for(Node n: G.nodes())
+			nodes.add(n);
+		ArrayList<Node[]> edges = new ArrayList<Node[]>();
+		for(int[] e: G.edges())
+			edges.add(new Node[] {nodes.get(e[0]),nodes.get(e[1])});
+		//make the graph acyclic if it is not
+		makeAcyclic(nodes,edges);
+		//assign layers
+		ArrayList<ArrayList<Node>> layers = assignLayers(nodes,edges);
+		//try to reduce crossings
 		reduceCrossings(G,layers);
+		//position the nodes of the real graph
 		for(int i = 0; i < layers.size(); i++) {
 			ArrayList<Node> layer = layers.get(i);
 			for(int j = 0; j < layer.size(); j++) {
@@ -41,47 +52,81 @@ public class LayeredEmbedding {
 	}
 	
 	/**
-	 * Checks whether the graph G is acylic or not.
+	 * Make a cyclic graph acyclic by removing loops (this is
+	 * done by reverting edges).
 	 * 
-	 * @param G A graph
-	 * @return True if G is acyclic; false otherwise.
+	 * @param nodes The nodes of a graph.
+	 * @param edges The edges of a graph.
 	 */
-	private static boolean isAcyclic(Graph G) {
-		//make copies
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		for(Node n: G.nodes())
-			nodes.add(n);
-		ArrayList<Node[]> edges = new ArrayList<Node[]>();
-		for(int[] e: G.edges())
-			edges.add(new Node[] {nodes.get(e[0]),nodes.get(e[1])});
+	private static void makeAcyclic(ArrayList<Node> nodes, ArrayList<Node[]> edges) {
 		
-		return(isAcyclic(nodes,edges));			
+		ArrayList<Node> nodesCopy = new ArrayList<Node>();
+		for(Node n: nodes)
+			nodesCopy.add(n);
+		ArrayList<Node[]> edgesCopy = new ArrayList<Node[]>();
+		for(Node[] e: edges)
+			edgesCopy.add(new Node[] {e[0],e[1]});
+		
+		ArrayList<Node[]> toReverse = edgesToReverse(nodesCopy,edgesCopy);
+		for(Node[] edge : toReverse) {
+			edges.removeIf(e->(e[0].equals(edge[0]) && e[1].equals(edge[1])));
+			edges.add(new Node[] {edge[1],edge[0]});
+		}
 	}
 	
 	/**
-	 * Internal function to recursively compute whether a graph is 
-	 * acyclic.
+	 * Computes the edges of a cyclic graph which have to 
+	 * be reversed in order to obtain an acyclic graph.
 	 * 
 	 * @param nodes Nodes of the graph.
 	 * @param edges Edges of the graph.
-	 * @return True if G is acyclic; false otherwise.
+	 * @return All edges of the graph that have to be reversed
+	 * to obtain an acyclic graph.
 	 */
-	private static boolean isAcyclic(ArrayList<Node> nodes, ArrayList<Node[]> edges) {
-		if(nodes.size() == 0)
-			return true;
-		for(Node n: nodes) {
-			boolean leaf = true;
-			for(Node[] edge: edges)
-				if(edge[0].equals(n))
-					leaf = false;
-			if(leaf) {
-				nodes.remove(n);
-				edges.removeIf(e -> (e[1] == n));
-				return(isAcyclic(nodes,edges));
-			}
+	private static ArrayList<Node[]> edgesToReverse(ArrayList<Node> nodes, ArrayList<Node[]> edges) {
+		ArrayList<Node[]> toReverse = new ArrayList<Node[]>();
+		while(nodes.size() > 0) {
+			ArrayList<Node> leaves = new ArrayList<Node>();
+			ArrayList<Node> sources = new ArrayList<Node>();
+			//find all leaves & sources
+			do {
+				leaves.clear();
+				sources.clear();
+				for(Node n : nodes) {
+					boolean leaf = true;
+					boolean source = true;
+					for(Node[] edge: edges) {
+						if(edge[0].equals(n))
+							leaf = false;
+						if(edge[1].equals(n))
+							source = false;
+					}
+					if(leaf)
+						leaves.add(n);
+					if(source)
+						sources.add(n);
+				}
+			
+				//delete all leaves and their edges
+				for(Node n: leaves) {
+					nodes.remove(n);
+					edges.removeIf(e -> (e[1] == n));
+				}
+			
+				//delete all sources and their edges
+				for(Node n: sources) {
+					if(nodes.contains(n))
+						nodes.remove(n);
+					edges.removeIf(e -> (e[0] == n));
+				}
+			}while(leaves.size() > 0 || sources.size() > 0);
+			//revert one edge
+			if(edges.size() > 0) {
+				toReverse.add(edges.get(0));
+				edges.remove(0);
+			}	
 		}
-		return false;
-		
+		return(toReverse);
 	}
 	
 	/**
@@ -92,14 +137,8 @@ public class LayeredEmbedding {
 	 * @return A list of lists of nodes, where each list of nodes 
 	 * corresponds to one layer.
 	 */
-	private static ArrayList<ArrayList<Node>> assignLayers(Graph G){
-		//make copies
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		for(Node n: G.nodes())
-			nodes.add(n);
-		ArrayList<Node[]> edges = new ArrayList<Node[]>();
-		for(int[] e: G.edges())
-			edges.add(new Node[] {nodes.get(e[0]),nodes.get(e[1])});
+	private static ArrayList<ArrayList<Node>> assignLayers(ArrayList<Node> nodes,ArrayList<Node[]> edges){
+		
 		ArrayList<ArrayList<Node>> sorted = new ArrayList<ArrayList<Node>>();
 		ArrayList<Node> start = nodesWithoutInEdges(nodes,edges);
 		while(start.size() > 0) {

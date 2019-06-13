@@ -18,7 +18,7 @@ import GraphDrawing.Vector;
 public class Node3D extends Node {
 
 	double[] position3D;
-	double distance;
+	public double distance;
 
 	static Vector X = new Vector(3, new double[] { 0, 1, 0 });
 	static Vector Y = new Vector(3, new double[] { 0, 0, 1 });
@@ -85,6 +85,43 @@ public class Node3D extends Node {
 			System.out.println("Distance of node " + G.nodes().get(i).name() + " to plane is: "
 					+ ((Node3D) G.nodes().get(i)).distance);
 		}
+		
+		double[] pos = ((Node3D) G.nodes().get(0)).position3D;
+		double xMin = pos[0];
+		double xMax = pos[0];
+		double yMin = pos[1];
+		double yMax = pos[1];
+		double zMin = pos[2];
+		double zMax = pos[2];
+		double maxDist = ((Node3D) G.nodes().get(0)).distance;
+		
+		for(int i = 1; i < G.nodes().size(); i++) {
+			pos = ((Node3D) G.nodes().get(i)).position3D;
+			if(pos[0] < xMin)
+				xMin = pos[0];
+			if(pos[0] > xMax)
+				xMax = pos[0];
+			if(pos[1] < yMin)
+				yMin = pos[1];
+			if(pos[1] > yMax)
+				yMax = pos[1];
+			if(pos[2] < zMin)
+				zMin = pos[2];
+			if(pos[2] > zMax)
+				zMax = pos[2];
+			if(((Node3D) G.nodes().get(i)).distance > maxDist)
+				maxDist = ((Node3D) G.nodes().get(i)).distance;
+		}
+		
+		double reference = Math.sqrt(Math.pow(xMax-xMin, 2) + Math.pow(yMax-yMin, 2) + Math.pow(zMax-zMin, 2));
+		for(int i = 0; i < G.nodes().size(); i++) {
+			double dist = ((Node3D) G.nodes().get(i)).distance;
+			double newDist = 1 - (maxDist - dist) / reference;
+			((Node3D) G.nodes().get(i)).distance = newDist;
+			
+			System.out.println(newDist);
+		}
+		
 		scale(G);
 	}
 
