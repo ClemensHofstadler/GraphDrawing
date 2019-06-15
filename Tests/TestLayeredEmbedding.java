@@ -56,12 +56,14 @@ public class TestLayeredEmbedding {
 		G.addEdge(nodes[0], nodes[1]);
 		G.addEdge(nodes[1], nodes[2]);
 		G.addEdge(nodes[2], nodes[0]);
-
+		
+		//should be horizontally aligned as
+		//2->3->1
 		LayeredEmbedding.defineLayout(G);
 		double[][] expectedPos = new double[3][];
-		expectedPos[0] = new double[] {0,0};
-		expectedPos[1] = new double[] {0,0};
-		expectedPos[2] = new double[] {0,0};
+		expectedPos[0] = new double[] {0.5,1};
+		expectedPos[1] = new double[] {0.5,0};
+		expectedPos[2] = new double[] {0.5,0.5};
 		double[][] realPos = new double[3][];
 		for(int i = 0; i < G.nodes().size();i++)
 			realPos[i] = G.nodes().get(i).position();
