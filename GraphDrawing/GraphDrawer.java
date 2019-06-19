@@ -134,7 +134,7 @@ public abstract class GraphDrawer {
 		
 		//draw edges
 		for(int[] edge: edges) {
-			double dist = ((Node3D) nodes.get(edge[1])).distance;
+			double dist = ((Node3D) nodes.get(edge[1])).getDistance();
 			double factor = 0.2+0.8*dist;
 			if(linearEdges)
 				drawLinearEdge(g,G,edge,(int)(factor*radius));
@@ -144,7 +144,7 @@ public abstract class GraphDrawer {
 		
 		//draw nodes - important to do this AFTER drawing the edges!!
 		for(Node n: nodes) {
-			double dist = ((Node3D) n).distance;
+			double dist = ((Node3D) n).getDistance();
 			double factor = 0.2+0.8*dist;
 			drawNode(g, n, (int)(factor*radius));
 		}

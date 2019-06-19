@@ -198,6 +198,15 @@ public class DrawingArea extends JPanel{
 //=======================================================================
 // Click & drag related functions
 //=======================================================================		
+	/**
+	 * Saves the position of the first click of the mouse
+	 * somewhere inside the drawing area
+	 * 
+	 * @param ptX x-coordinate of the position where the
+	 * mouse was clicked but scaled down to the unit square.
+	 * @param ptY y-coordinate of the position where the
+	 * mouse was clicked but scaled down to the unit square.
+	 */
 	public void firstClick(double ptX, double ptY) {
 		xMoveReference = ptX;
 		yMoveReference = ptY;
@@ -205,6 +214,12 @@ public class DrawingArea extends JPanel{
 		yMoveReferenceScaled = y;
 	}
 	
+	/**
+	 * Moves the currently displayed picture to the 
+	 * position (xNew,yNew).
+	 * @param xNew New x-coordinate.
+	 * @param yNew New y-coordinate.
+	 */
 	public void move(double xNew, double yNew) {
 		double dx = xMoveReference - xNew;
 		double dy = yMoveReference - yNew;
