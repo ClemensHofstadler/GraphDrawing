@@ -70,7 +70,7 @@ import GraphDrawing.GraphDrawer;
  * <li> {@link LinearEmbedding LinearEmbedding}
  * <li> {@link RandomEmbedding RandomEmbedding}
  * <li> {@link SpectralEmbedding SpectralEmbedding}
- * <li> {@link AdaptiveSpringEmbedding SpringEmbedding}	
+ * <li> {@link SpringEmbedding SpringEmbedding}	
  * </ul>
  * 
  * Additional functionality such as displaying information about the graph 
@@ -472,61 +472,6 @@ public class GUI {
 		springEmbeddingMenu.add(mntmSpringEmbedding3D);
 		mnLayout.add(springEmbeddingMenu);
 		
-		JMenuItem mntmSpringEmbeddingAnimation = new JMenuItem("Spring embedding (animated)");
-		mntmSpringEmbeddingAnimation.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(G==null)
-					return;
-				//set new stats
-				drawingArea.reset();
-				drawingArea.setLinearEdges(true);
-				drawingArea.setThreeDLayout(false);
-				//print new layout
-				GridEmbedding.defineLayout(G);// Random or Grid
-				drawingArea.setGraph(G);
-				drawingArea.paint(drawingArea.getGraphics());
-
-				//AnimatedSpringEmbedding animation = new AnimatedSpringEmbedding(G);
-				
-				/*Thread thread = new Thread() {
-					@SuppressWarnings("deprecation")
-					@Override
-					public void run() {
-						int iter = 0;
-						while (!animation.converged && iter < AnimatedSpringEmbedding.maximumIterations) {
-							iter++;
-							try {
-								Thread.sleep(150);
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-
-							animation.iterateOnce();
-
-							Graph g = new Graph();
-							for (Node node : animation.graph().nodes()) {
-								Node n = new Node(node.name());
-								n.setPosition(node.x(), node.y());
-								g.addNode(n);
-							}
-							for (int[] edge : animation.graph().edges()) {
-								int n1 = edge[0];
-								int n2 = edge[1];
-								g.addEdge(g.nodes().get(n1), g.nodes().get(n2));
-							}
-							AdaptiveSpringEmbedding.scale(g);
-							drawingArea.setGraph(g);
-							drawingArea.paint(drawingArea.getGraphics());
-						}
-						this.stop();
-						
-					}
-				};
-				thread.start();*/
-			}
-		});
-		mnLayout.add(mntmSpringEmbeddingAnimation);
 //===========================================================================================
 //Help page
 //===========================================================================================		
