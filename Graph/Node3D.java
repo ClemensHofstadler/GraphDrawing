@@ -17,11 +17,11 @@ import GraphDrawing.Vector;
  */
 public class Node3D extends Node {
 
-	double[] position3D;
-	public double distance;
+	private double[] position3D;
+	private double distance;
 
-	static Vector X = new Vector(3, new double[] { 0, 1, 0 });
-	static Vector Y = new Vector(3, new double[] { 0, 0, 1 });
+	private static Vector X = new Vector(3, new double[] { 0, 1, 0 });
+	private static Vector Y = new Vector(3, new double[] { 0, 0, 1 });
 
 	/**
 	 * See constructor Node(String name).
@@ -61,6 +61,10 @@ public class Node3D extends Node {
 	 */
 	public double[] getposition3D() {
 		return position3D;
+	}
+	
+	public double getDistance() {
+		return distance;
 	}
 
 	/**
