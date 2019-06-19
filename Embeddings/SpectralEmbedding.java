@@ -8,9 +8,9 @@ import Jama.Matrix;
 
 /**
  * Class to align a graph according to a spectral embedding. This means
- * that the nodes of the graph are aligned according to the 2 eigenvectors
+ * that the nodes of the graph are aligned according to the eigenvectors
  * corresponding to the smallest non-zero eigenvalues of the Lagrangian matrix 
- * of the graph.
+ * of the graph. This class provides a 2D layout and a 3D layout.
  * 
  * @author Clemens Hofstadler
  * @version 1.0.0, 31st May 2019
@@ -18,12 +18,17 @@ import Jama.Matrix;
  */
 public class SpectralEmbedding {
 	/**
-	 * Aligns the nodes of a graph G on the unit square
-	 * according to a spectral embedding.
+	 * Aligns the nodes of a graph G according to a spectral 
+	 * embedding. Either in 2 dimensions (in the unit square)
+	 * or in 3 dimensions (in the unit cube).
 	 * 
-	 * @param G A graph.
+	 * @param G The graph to be aligned.
+	 * @param dim Defines the dimension in which the embedding
+	 * will be computed. Either 2 or 3.
 	 */
 	public static void defineLayout(Graph G, int dim) {
+		if(G.nodes().size() == 0)
+			return;
 		//if less than 4 nodes, we have not enough eigenvectors
 		//use springEmbedding instead
 		if(G.nodes().size() < 4) {
@@ -36,7 +41,15 @@ public class SpectralEmbedding {
 		if(dim == 3)
 			defineLayout3D(G);
 	}
-	
+//==============================================================================
+// 2D and 3D layout
+//==============================================================================
+	/**
+	 * Aligns the nodes of a graph G according to a spectral 
+	 * embedding in 2 dimensions (in the unit square).
+	 * 
+	 * @param G The graph to be aligned.
+	 */
 	private static void defineLayout2D(Graph G) {
 		//Compute the Lagrangian matrix of G 
 		//and its eigenvectors
@@ -55,7 +68,13 @@ public class SpectralEmbedding {
 			G.nodes().get(i).setPosition(x, y);
 		}
 	}
-	
+//==============================================================================
+	/**
+	 * Aligns the nodes of a graph G according to a spectral 
+	 * embedding in 3 dimensions (in the unit cube).
+	 * 
+	 * @param G The graph to be aligned.
+	 */
 	private static void defineLayout3D(Graph G) {
 		//Compute the Lagrangian matrix of G
 		//and its eigenvectors
@@ -77,12 +96,15 @@ public class SpectralEmbedding {
 			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), new double[] {x,y,z});
 			newNode.setColor(oldNode.color());
 			G.nodes().set(i, newNode);
+			System.out.println("(" + x + ", " + y + ", " + z + ")");
 		}
 		
 		//project nodes down
 		Node3D.project3DPoints(G);
 	}
-	
+//==============================================================================
+// Matrix & eigenvector computations 
+//==============================================================================	
 	/**
 	 * Computes the adjacency matrix of the graph G. To compute 
 	 * this matrix, we consider the graph G to be undirected. This
@@ -102,7 +124,7 @@ public class SpectralEmbedding {
 		
 		return A;
 	}
-	
+//==============================================================================	
 	/**
 	 * Computes the degree matrix of the Graph G. i.e. a diagonal matrix where the
 	 * i-th diagonal element is the degree of the i-th node of G, where G is considered
@@ -121,29 +143,38 @@ public class SpectralEmbedding {
 		}
 		return D;
 	}
-	
+//==============================================================================	
 	/**
-	 * Computes the eigenvectors for the 2nd and 3rd
-	 * smallest eigenvalues of a symmetric matrix M.
+	 * Computes eigenvectors corresponding to the "dim"
+	 * smallest non-zero eigenvalues of a symmetric matrix.
 	 * 
 	 * @param M A symmetric matrix.
-	 * @return The eigenvectors for the 2nd and 3rd
-	 * smallest eigenvalues 
-	 * of M.
+	 * @param dim Number of eigenvectors to be computed.
+	 * @return The eigenvectors for the "dim" smallest
+	 * non-zero eigenvalues of M.
 	 */
 	private static double[][] getMinEigenvectors(Matrix M,int dim) {
 		//compute the eigensystem of M
 		EigenvalueDecomposition eig = M.eig();
-
+		
 		//eigenvectors are sorted in ascending order
 		//ignore eigenvector corresponding to eigenvalue 0
 		double[][] eigVectors = new double[dim][M.getColumnDimension()];
 		Matrix eigV = eig.getV().transpose();
 		for(int i = 0; i < dim; i++)
 			eigVectors[i] = eigV.getArray()[i+1];
+		
 		return eigVectors;
 	}
-	
+//==============================================================================	
+	/**
+	 * Computes the smallest and largest element of a 
+	 * double array.
+	 * 
+	 * @param a An array.
+	 * @return A pair (min,max) consisting of the
+	 * minimal and maximal element of a.
+	 */
 	private static double[] minMax(double[] a) {
 		double min = a[0];
 		double max = a[0];
