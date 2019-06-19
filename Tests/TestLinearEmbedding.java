@@ -2,7 +2,6 @@ package Tests;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import Embeddings.LinearEmbedding;
 import Graph.Graph;
 import Graph.Node;
