@@ -226,9 +226,9 @@ public class GUI {
 				        	int space = line.indexOf(' ');
 				        	Node n1 = new Node(line.substring(0, space));
 				        	Node n2 = new Node(line.substring(space + 1, line.length()));
+				        	G.addNode(n1);
+			        		G.addNode(n2);
 				        	if(!n1.equals(n2)) {
-				        		G.addNode(n1);
-				        		G.addNode(n2);
 				        		G.addEdge(n1, n2);
 				        	}
 				        	line = in.readLine();	
@@ -419,7 +419,6 @@ public class GUI {
 				randomButton.setVisible(true);
 				gridLayoutButton.setVisible(true);
 				drawingArea.setLinearEdges(true);
-				//print new layout
 				//AdaptiveSpringEmbedding.defineLayout(G, 0);
 				int index = 0;
 				if(markedNode != null)
