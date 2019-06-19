@@ -28,6 +28,15 @@ Each line of the file must contain two strings seperated by a single whitespace 
 Bob Charly<br>
 Alice Charly</p>
 
+<p class="tab">
+Lines of the form <i>Alice Alice</i> or <i>1 1</i> are not interpreted as loops but as a single node without any edges. So, for example the input</p>
+<p class="tab">
+1 1<br>
+2 2<br>
+3 3</p>
+<p class="tab"> would give a graph consisting of 3 nodes without any edges.</p>
+
+
 <h2 class="tab">Supported layouts</h2>
 <p class="tab">The following layouts are available:</p>
 <ul>
@@ -64,7 +73,10 @@ Using the random embedding, the nodes of the graph will be placed randomly and t
 </p> 
 
 <h3 class="tab">Spectral embedding</h3>
-<p class="tab">The spectral embedding uses the eigenvectors of the Laplacian matrix of the graph as Cartesian coordinates of the graph's nodes. The idea of the layout is to compute the two smallest non-zero eigenvalues (the smallest eigenvalue of the Laplacian matrix is always 0 and holds no interesting information) and corresponding eigenvectors of the Laplacian matrix of the graph and then the x-coordinate of the i-th node is the value of the i-th coordinate of the first eigenvector. Correspondingly the i-th component of the second eigenvector describes the y-coordinate of the node i. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
+<p class="tab">The spectral embedding uses the eigenvectors of the Laplacian matrix of the graph as Cartesian coordinates of the graph's nodes. This embedding can be done in two or in three dimensions. 
+
+
+The idea of the layout is to compute the two or three, respectively, smallest non-zero eigenvalues (the smallest eigenvalue of the Laplacian matrix is always 0 and contains no interesting information) and corresponding eigenvectors of the Laplacian matrix of the graph. Then, the x-coordinate of the i-th node is the value of the i-th coordinate of the first eigenvector. Correspondingly the i-th component of the second eigenvector describes the y-coordinate of the node i. And if working in three dimensions, the z-coordinate of the i-th node is given by the i-th component of the third eigenvector. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).
 </p>
 
 
@@ -74,7 +86,8 @@ The spring embedding implements a force-based graph drawing algorithm.
 Edges are considered as springs and nodes repel each other (like electrical charges).
 Nodes are moved according to forces acting on them, unitl a stable
 constellation is found. The algorithm tries to reduce the total energy of the
-system. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).</p>
+system. Like the Spectral embedding, also the Spring embedding can be executed in two or
+in three dimesions. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).</p>
 
 
 <h2 class="tab">Additional information</h2>
@@ -85,7 +98,7 @@ is listed.
 
 <h3 class="tab">Information about the graph</h3>
 <p class="tab">
-When a graph is loaded, in the section to the right of the drawing area some information about the graph is provided. This consists of a listing of the nodes of the graph and its edges. The user can also click on a certain node, in this case the node clicked on will be coloured differently and information about this node will be displayed. This information consists of the name of the node, all outgoing edges as well as all incoming edges.
+When a graph is loaded, in the section to the right of the drawing area some information about the graph is provided. This consists of a listing of the nodes of the graph and its edges. The user can also click on a certain node, in this case the node clicked on will be coloured differently and information about this node will be displayed. This information consists of the name of the node, all outgoing edges as well as all incoming edges. Also, all adjancent nodes of the node clicked on are coloured differently depending on their relation to the clicked node. If a neighbouring node has an edge going to the clicked node it is coloured blue, if a neighbouring node has an edge coming from the clicked node it is coloured red and if a neighbouring node has both, an edge going to the clicked node as well as a node coming from the clicked node, it is coloured in magenta. In case of undirected graphs, all adjacent nodes are coloured in magenta.
 </p>
 
 <h3 class="tab">Saving a graph</h3>
@@ -96,6 +109,11 @@ Using the "Save" button to the right of the drawing area, the user can save the 
 <h3 class="tab">Zooming & Dragging</h3>
 <p class="tab">
 When working with larger graphs it is very likely that several nodes get placed close together. Then, in order to better see what is going on, the user can zoom in to certain positions and can drag the current part of the picture around. The zooming can be done by placing the mouse over a certain position and turning the mousewheel, then the application will zoom into this position. By moving the mouse around while holding the left mouse button the currently displayed part of the graph can be shifted around. 
+</p>
+
+<h3 class="tab">Rotation</h3>
+<p class="tab">
+When working with the Spectral or Spring embedding in three dimensions, it is possible to rotate the graph using the keys "a" (rotation to the left), "d" (rotation to the right), "w" (rotation up) and "s" (rotation down).
 </p>
 
 <p><br>
