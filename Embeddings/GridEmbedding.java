@@ -20,7 +20,7 @@ public class GridEmbedding {
 	 * @param G A Graph
 	 */
 	public static void defineLayout(Graph G) {
-		int n = 1 + (int) Math.sqrt(G.nodes().size());
+		int n = (int) Math.round(Math.ceil(Math.sqrt(G.nodes().size())));
 		defineLayout(G, n);
 	};
 
