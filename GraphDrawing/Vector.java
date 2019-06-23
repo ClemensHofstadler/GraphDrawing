@@ -9,7 +9,13 @@ package GraphDrawing;
  * @version 1.0.1, 13rd June 2019
  */
 public class Vector {
+	/**
+	 * Specifies the dimension of the space where this vector should live in.
+	 */
 	private int dimension;
+	/**
+	 * Contains all coordinates.
+	 */
 	private double[] coordinates;
 
 	/**
