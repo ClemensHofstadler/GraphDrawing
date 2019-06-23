@@ -1,7 +1,6 @@
 package Graph;
 
 import java.util.ArrayList;
-import GraphDrawing.Vector;
 
 /**
  * Extends the class Node in a way that Nodes can be positioned in 3 dimensional
