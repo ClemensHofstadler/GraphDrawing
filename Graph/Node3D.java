@@ -13,13 +13,26 @@ import GraphDrawing.Vector;
  * is stored.
  * 
  * @author Lukas Wögerer
- * @version 1.0.1, 13rd June 2019
+ * @version 1.0.2, 23rd June 2019
  */
 public class Node3D extends Node {
 
+	/**
+	 * Positions of node in three dimensions.
+	 */
 	private double[] position3D;
+	/**
+	 * A number that corresponds to the distance of this node to a plane determined
+	 * by the two vectors X and Y (which are always normal to each other) and the
+	 * origin of the coordinate system.
+	 */
 	private double distance;
 
+	/**
+	 * The two vectors X and Y (which are always normal to each other) and the
+	 * origin of the coordinate system determine a plane lying in three dimensional
+	 * space.
+	 */
 	private static Vector X = new Vector(3, new double[] { 0, 1, 0 });
 	private static Vector Y = new Vector(3, new double[] { 0, 0, 1 });
 
@@ -62,7 +75,7 @@ public class Node3D extends Node {
 	public double[] getposition3D() {
 		return position3D;
 	}
-	
+
 	public double getDistance() {
 		return distance;
 	}
@@ -89,7 +102,7 @@ public class Node3D extends Node {
 			System.out.println("Distance of node " + G.nodes().get(i).name() + " to plane is: "
 					+ ((Node3D) G.nodes().get(i)).distance);
 		}
-		
+
 		double[] pos = ((Node3D) G.nodes().get(0)).position3D;
 		double xMin = pos[0];
 		double xMax = pos[0];
@@ -98,34 +111,34 @@ public class Node3D extends Node {
 		double zMin = pos[2];
 		double zMax = pos[2];
 		double maxDist = ((Node3D) G.nodes().get(0)).distance;
-		
-		for(int i = 1; i < G.nodes().size(); i++) {
+
+		for (int i = 1; i < G.nodes().size(); i++) {
 			pos = ((Node3D) G.nodes().get(i)).position3D;
-			if(pos[0] < xMin)
+			if (pos[0] < xMin)
 				xMin = pos[0];
-			if(pos[0] > xMax)
+			if (pos[0] > xMax)
 				xMax = pos[0];
-			if(pos[1] < yMin)
+			if (pos[1] < yMin)
 				yMin = pos[1];
-			if(pos[1] > yMax)
+			if (pos[1] > yMax)
 				yMax = pos[1];
-			if(pos[2] < zMin)
+			if (pos[2] < zMin)
 				zMin = pos[2];
-			if(pos[2] > zMax)
+			if (pos[2] > zMax)
 				zMax = pos[2];
-			if(((Node3D) G.nodes().get(i)).distance > maxDist)
+			if (((Node3D) G.nodes().get(i)).distance > maxDist)
 				maxDist = ((Node3D) G.nodes().get(i)).distance;
 		}
-		
-		double reference = Math.sqrt(Math.pow(xMax-xMin, 2) + Math.pow(yMax-yMin, 2) + Math.pow(zMax-zMin, 2));
-		for(int i = 0; i < G.nodes().size(); i++) {
+
+		double reference = Math.sqrt(Math.pow(xMax - xMin, 2) + Math.pow(yMax - yMin, 2) + Math.pow(zMax - zMin, 2));
+		for (int i = 0; i < G.nodes().size(); i++) {
 			double dist = ((Node3D) G.nodes().get(i)).distance;
 			double newDist = 1 - (maxDist - dist) / reference;
 			((Node3D) G.nodes().get(i)).distance = newDist;
-			
+
 			System.out.println(newDist);
 		}
-		
+
 		scale(G);
 	}
 
