@@ -16,14 +16,38 @@ import GraphDrawing.Vector;
  * iterations.
  * 
  * @author Lukas Wögerer
- * @version 1.0.1, 13rd June 2019
+ * @version 1.0.2, 23rd June 2019
  */
 public class SpringEmbedding {
+	/**
+	 * No matter how K and C are chosen, this way of calculating a layout will
+	 * always produce equivalent results. (Equivalent up to scaling. But since at
+	 * the end the layout is scaled such that it fits inside the unit square/cube,
+	 * the choice of K and C does not matter)
+	 */
 	static final double K = 1.;
 	static final double C = 1.;
+	/**
+	 * Initial step length is just the initial value with which the iteration should
+	 * start. For further information on what the step length is for, read more
+	 * about the method 'updateSteplength'.
+	 */
 	static final double INITIAL_STEP_LENGTH = 0.1;
+	/**
+	 * The algorithm stops and has reached its final state when a change in the
+	 * layout between two consecutive iterations is less than K*TOLERANCE.
+	 */
 	static final double TOLERANCE = 0.000001d;
+	/**
+	 * This is the factor by which the step size can be adjusted (new step length is
+	 * either equal to step/T or step*T),
+	 */
 	static final double T = 0.9;
+	/**
+	 * If each node is moved MAXIMUM_ITERATIONS times, the process stops and the
+	 * current layout is chosen as the final layout. In other words: not more than
+	 * MAXIMUM_ITERATIONS iterations are performed.
+	 */
 	static final int MAXIMUM_ITERATIONS = 1000;
 
 	static int progress;
@@ -109,7 +133,15 @@ public class SpringEmbedding {
 	}
 
 	/**
-	 * TODO
+	 * Iterates once over all nodes and for each node the sum of all forces acting
+	 * on it is calculated. As soon as all forces acting on one specific node are
+	 * sum up, this node is moved a tiny bit in the direction of the total force.
+	 * The magnitude of this movement is influenced by a variable called 'step'. It
+	 * gets bigger or smaller depending on how effective the last movement was, and
+	 * is changed at the very end of this method. This method returns whether the
+	 * procedure converged (i.e if the final embedding is reached). This can happen
+	 * either if the maximum number of iterations MAXIMUM_ITERATIONS is reached, or
+	 * the movement of the nodes were very small.
 	 * 
 	 * @param G         A Graph
 	 * @param dimension Can be 2 or 3, and decides whether the nodes should lie
@@ -221,12 +253,17 @@ public class SpringEmbedding {
 	}
 
 	/**
-	 * TODO
+	 * This method updates the static variable 'step', which has affect on how much
+	 * each nodes is moved within an iteration. A high value of 'step' corresponds
+	 * to much greater movement than a smaller value. How the value will change
+	 * depends on the performance of the last iteration, and thus on the previously
+	 * used value of 'step' and the total energy of the system before and after an
+	 * iteration.
 	 * 
 	 * @param step
-	 * @param Energy
-	 * @param Energy0
-	 * @return
+	 * @param Energy  Total energy before iteration.
+	 * @param Energy0 Total energy after iteration.
+	 * @return double New step-length
 	 */
 	private static double updateSteplength(double step, double Energy, double Energy0) {
 		if (Energy < Energy0) {
