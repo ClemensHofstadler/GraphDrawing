@@ -83,6 +83,9 @@ public class SpringEmbedding {
 	 *                   layout (only when dim=2 and layoutType=0) or randomly.
 	 */
 	public static void defineLayout(Graph G, int dimension, int layoutType) {
+		if(G.nodes().size()==0)
+			return;
+
 		progress = 0;
 		step = INITIAL_STEP_LENGTH;
 		E = Double.MAX_VALUE;
