@@ -82,12 +82,7 @@ The idea of the layout is to compute the two or three, respectively, smallest no
 
 <h3 class="tab">Spring embedding</h3>
 <p class="tab">
-The spring embedding implements a force-based graph drawing algorithm.
-Edges are considered as springs and nodes repel each other (like electrical charges).
-Nodes are moved according to forces acting on them, unitl a stable
-constellation is found. The algorithm tries to reduce the total energy of the
-system. Like the Spectral embedding, also the Spring embedding can be executed in two or
-in three dimesions. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).</p>
+The spring embedding starts from either the grid embedding or random embedding, depending on what the user wants. From this on, all nodes are considered as electrical charges that repel each other. This force is inversely proportional to the distance between two nodes. If two nodes are connected by an edge, one more force is acting on them: They are attracted to each other, as if they were connected by a spring. This force is proportional to the square of distance of those two nodes. Spring embedding now tries to position the nodes in such a way that all forces on all nodes are zero. This is done by iterating over all nodes and move nodes in the direction of the acting force. This procedure is repeated several times and the final embedding is reached either if a maximum number of iterations is reached, or the movement of the nodes (new positions compared to previous positions) is very small. Like the Spectral embedding, also the Spring embedding can be executed in two or in three dimesions. Edges between the nodes are drawn as straight lines (with an arrow at the end indicating the direction of the edge in case of a directed graph).</p>
 
 
 <h2 class="tab">Additional information</h2>
