@@ -137,7 +137,9 @@ public class Node3D extends Node {
 		double reference = Math.sqrt(Math.pow(xMax - xMin, 2) + Math.pow(yMax - yMin, 2) + Math.pow(zMax - zMin, 2));
 		for (int i = 0; i < G.nodes().size(); i++) {
 			double dist = ((Node3D) G.nodes().get(i)).distance;
-			double newDist = 1 - (maxDist - dist) / reference;
+			double newDist = 0;
+			if(reference!=0)
+				newDist = 1 - (maxDist - dist) / reference;
 			((Node3D) G.nodes().get(i)).distance = newDist;
 
 			System.out.println(newDist);
