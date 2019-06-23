@@ -26,6 +26,12 @@ public class SpringEmbedding {
 	 * the choice of K and C does not matter)
 	 */
 	static final double K = 1.;
+	/**
+	 * No matter how K and C are chosen, this way of calculating a layout will
+	 * always produce equivalent results. (Equivalent up to scaling. But since at
+	 * the end the layout is scaled such that it fits inside the unit square/cube,
+	 * the choice of K and C does not matter)
+	 */
 	static final double C = 1.;
 	/**
 	 * Initial step length is just the initial value with which the iteration should
@@ -50,8 +56,19 @@ public class SpringEmbedding {
 	 */
 	static final int MAXIMUM_ITERATIONS = 1000;
 
+	/**
+	 * Represents how effective the last iterations were.
+	 */
 	static int progress;
+	/**
+	 * For further information on what the step length is for, read more about the
+	 * method 'updateSteplength'.
+	 */
 	static double step;
+	/**
+	 * Represents the total energy of the system. The change of this value has
+	 * influence on how the variable 'step' changes.
+	 */
 	static double E;
 
 	/**
