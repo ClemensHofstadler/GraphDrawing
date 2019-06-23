@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import Graph.Graph;
 import Graph.Node;
 import Graph.Node3D;
-import GraphDrawing.Vector;
+import Graph.Vector;
 
 /**
  * Implements an force-based graph drawing algorithm. Edges are considered as
