@@ -34,6 +34,11 @@ public class Node3D extends Node {
 	 * space.
 	 */
 	private static Vector X = new Vector(3, new double[] { 0, 1, 0 });
+	/**
+	 * The two vectors X and Y (which are always normal to each other) and the
+	 * origin of the coordinate system determine a plane lying in three dimensional
+	 * space.
+	 */
 	private static Vector Y = new Vector(3, new double[] { 0, 0, 1 });
 
 	/**
