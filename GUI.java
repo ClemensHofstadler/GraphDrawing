@@ -654,11 +654,7 @@ public class GUI {
 			public void actionPerformed(ActionEvent tf) {
 				if(drawingArea.threeDLayout())
 				{
-					System.out.println(tf.getActionCommand());
 					Node3D.rotate(tf.getActionCommand(), G);
-					//drawingArea.reset();
-					//drawingArea.setGraph(G);
-					//drawingArea.setLinearEdges(true);
 					drawingArea.paint(drawingArea.getGraphics());
 				}
 			}
