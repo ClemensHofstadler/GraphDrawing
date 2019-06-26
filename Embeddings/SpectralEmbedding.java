@@ -96,7 +96,6 @@ public class SpectralEmbedding {
 			Node3D newNode = new Node3D(oldNode.name(), oldNode.position(), new double[] {x,y,z});
 			newNode.setColor(oldNode.color());
 			G.nodes().set(i, newNode);
-			System.out.println("(" + x + ", " + y + ", " + z + ")");
 		}
 		
 		//project nodes down
