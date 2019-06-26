@@ -103,8 +103,6 @@ public class Node3D extends Node {
 			G.nodes().get(i).setPosition(newX, newY);
 
 			((Node3D) G.nodes().get(i)).distance = -Vector.dotProduct(normalVector, pos);
-			System.out.println("Distance of node " + G.nodes().get(i).name() + " to plane is: "
-					+ ((Node3D) G.nodes().get(i)).distance);
 		}
 
 		double[] pos = ((Node3D) G.nodes().get(0)).position3D;
@@ -141,8 +139,6 @@ public class Node3D extends Node {
 			if(reference!=0)
 				newDist = 1 - (maxDist - dist) / reference;
 			((Node3D) G.nodes().get(i)).distance = newDist;
-
-			System.out.println(newDist);
 		}
 
 		scale(G);
