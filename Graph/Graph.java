@@ -120,9 +120,13 @@ public class Graph {
 	 * @param x x-coordinate of the point that is considered.
 	 * @param y y-coordinate of the point that is considered.
 	 * 
-	 * @return The nearest node to the point (x,y)
+	 * @return The nearest node to the point (x,y) or null if
+	 * the graph does not contain any nodes.
 	 */
 	public Node nearestNode(double x, double y) {
+		if(nodes.size() == 0)
+			return null;
+			
 		Node n = nodes.get(0);
 		double minDistance = Math.sqrt(Math.pow(x-n.x(), 2)+Math.pow(y-n.y(), 2));
 		double testDistance;
