@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * projection is done, also the distance of the point two the specified 2D plane
  * is stored.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.2, 23rd June 2019
  */
 public class Node3D extends Node {

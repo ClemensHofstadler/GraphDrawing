@@ -6,7 +6,7 @@ import Graph.Node;
  * Class to align a graph according to a random embedding. This means
  * that all nodes are placed randomly in the unit square.
  * 
- * @author Clemens Hofstadler
+ * @author Lukas W&oumlgerer
  * @version 1.0.0, 31st May 2019
  *
  */

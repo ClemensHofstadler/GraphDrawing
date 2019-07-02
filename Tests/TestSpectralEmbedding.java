@@ -11,7 +11,13 @@ import Embeddings.SpringEmbedding;
 import Graph.Graph;
 import Graph.Node;
 import Graph.Node3D;
-
+/**
+ * JUnit 4 test class for the class {@link Embeddings.SpectralEmbedding SpectralEmbedding}.
+ * 
+ * @author Clemens Hofstadler
+ * @version 1.0.0, 11th June 2019
+ *
+ */
 public class TestSpectralEmbedding {
 	private static Graph G;
 	private static Node[] nodes;

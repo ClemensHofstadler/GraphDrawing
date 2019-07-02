@@ -16,7 +16,7 @@ import java.awt.RenderingHints;
  * precisely, it is possible to draw graphs with straight edges and
  * graphs with semicircular edges.
  * 
- * @author Clemens Hofstadler, Lukas Wögerer
+ * @author Clemens Hofstadler, Lukas W&oumlgerer
  * @version 1.0.0, 31st May 2019
  *
  */

@@ -10,9 +10,9 @@ import Graph.Graph;
 import Graph.Node;
 
 /**
- * JUnit 4 test class for the class {@link SpringEmbedding SpringEmbedding}.
+ * JUnit 4 test class for the class {@link Embeddings.SpringEmbedding SpringEmbedding}.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.0, 23rd June 2019
  *
  */

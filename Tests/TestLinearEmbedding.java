@@ -6,7 +6,7 @@ import Embeddings.LinearEmbedding;
 import Graph.Graph;
 import Graph.Node;
 /**
- * JUnit 4 test class for the class {@link LinearEmbedding LinearEmbedding}.
+ * JUnit 4 test class for the class {@link Embeddings.LinearEmbedding LinearEmbedding}.
  * 
  * @author Clemens Hofstadler
  * @version 1.0.0, 11th June 2019

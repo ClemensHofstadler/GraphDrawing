@@ -64,20 +64,20 @@ import GraphDrawing.GraphDrawer;
  * Graphs are loaded from a txt-file and can be visualized with the
  * following layouts:
  * <ul>
- * <li> {@link CircularEmbedding CircularEmbedding}
- * <li> {@link GridEmbedding GridEmbedding}
- * <li> {@link LayeredEmbedding LayeredEmbedding}
- * <li> {@link LinearEmbedding LinearEmbedding}
- * <li> {@link RandomEmbedding RandomEmbedding}
- * <li> {@link SpectralEmbedding SpectralEmbedding}
- * <li> {@link SpringEmbedding SpringEmbedding}	
+ * <li> {@link Embeddings.CircularEmbedding CircularEmbedding}
+ * <li> {@link Embeddings.GridEmbedding GridEmbedding}
+ * <li> {@link Embeddings.LayeredEmbedding LayeredEmbedding}
+ * <li> {@link Embeddings.LinearEmbedding LinearEmbedding}
+ * <li> {@link Embeddings.RandomEmbedding RandomEmbedding}
+ * <li> {@link Embeddings.SpectralEmbedding SpectralEmbedding}
+ * <li> {@link Embeddings.SpringEmbedding SpringEmbedding}	
  * </ul>
  * 
  * Additional functionality such as displaying information about the graph 
  * and/or certain nodes, saving the currently displayed layout as a picture 
  * or zooming is also provided.
  * 
- * @author Clemens Hofstadler, Lukas Wögerer
+ * @author Clemens Hofstadler, Lukas W&oumlgerer
  * @version 1.0.1, 13rd June 2019
  *
  */

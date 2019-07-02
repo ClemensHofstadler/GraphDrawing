@@ -14,7 +14,7 @@ import Graph.Graph;
 /**
  * Subclass of the JPanel class. A drawing area on which graphs can be drawn.
  * 
- * @author Clemens Hofstadler, Lukas Wögerer
+ * @author Clemens Hofstadler, Lukas W&oumlgerer
  * @version 1.0.0, 1st June 2019
  *
  */

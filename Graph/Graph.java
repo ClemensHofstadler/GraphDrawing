@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * (i,j) determining an edge starting at node i and ending at node j. 
  * The index of a node is given by its position in the list of nodes.
  * 
- * @author Clemens Hofstadler, Lukas Wögerer
+ * @author Clemens Hofstadler, Lukas W&oumlgerer
  * @version 1.0.0, 1st June 2019
  *
  */

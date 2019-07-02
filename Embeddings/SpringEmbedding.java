@@ -15,7 +15,7 @@ import Graph.Vector;
  * energy of the system, but stops after at most "MAXIMUM_ITERATIONS"
  * iterations.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.2, 23rd June 2019
  */
 public class SpringEmbedding {

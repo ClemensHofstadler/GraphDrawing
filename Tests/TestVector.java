@@ -7,9 +7,9 @@ import org.junit.Test;
 import Graph.Vector;
 
 /**
- * JUnit 4 test class for the class {@link Node3D Node3D}.
+ * JUnit 4 test class for the class {@link Graph.Vector Vector}.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.0, 23rd June 2019
  *
  */

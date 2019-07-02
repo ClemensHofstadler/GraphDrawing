@@ -7,7 +7,7 @@ import Graph.Node;
  * Implements an graph drawing algorithm where each edge lies on the vertex of a
  * regular grid.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.1, 13rd June 2019
  */
 public class GridEmbedding {

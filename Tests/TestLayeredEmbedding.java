@@ -7,7 +7,7 @@ import Embeddings.LayeredEmbedding;
 import Graph.Graph;
 import Graph.Node;
 /**
- * JUnit 4 test class for the class {@link LayeredEmbedding LayeredEmbedding}.
+ * JUnit 4 test class for the class {@link Embeddings.LayeredEmbedding LayeredEmbedding}.
  * 
  * @author Clemens Hofstadler
  * @version 1.0.0, 11th June 2019

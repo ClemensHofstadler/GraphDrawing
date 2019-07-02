@@ -133,7 +133,8 @@ public class LayeredEmbedding {
 	 * Divides the nodes of G into layers such that all edges of
 	 * G show in the same direction.
 	 * 
-	 * @param G An acyclic graph.
+	 * @param nodes The nodes of the graph.
+	 * @param edges The edges of the graph.
 	 * @return A list of lists of nodes, where each list of nodes 
 	 * corresponds to one layer.
 	 */

@@ -5,7 +5,7 @@ package Graph;
  * functions such as adding two vectors, multiplying them by constants,
  * calculating the dot product of two vectors and more.
  * 
- * @author Lukas Wögerer
+ * @author Lukas W&oumlgerer
  * @version 1.0.1, 13rd June 2019
  */
 public class Vector {
